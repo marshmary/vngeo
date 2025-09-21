@@ -4,6 +4,19 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# Serve map data files directly without redirecting to SPA
+[[redirects]]
+  from = "/vietnam-map-data/*"
+  to = "/vietnam-map-data/:splat"
+  status = 200
+
+# Serve other static assets directly
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+
+# SPA fallback for all other routes
 [[redirects]]
   from = "/*"
   to = "/index.html"

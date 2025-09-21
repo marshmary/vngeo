@@ -97,7 +97,6 @@ dist
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
@@ -117,15 +116,6 @@ temp/
 *.tar.gz
 *.rar
 *.7z
-
-# Map data files that are too large
-*.geojson
-vietnam-map-data/
-public/vietnam-map-data/
-
-# Exclude large GeoJSON files but keep smaller ones
-!public/vietnam-map-data/gadm41_VNM_0.json
-!public/vietnam-map-data/gadm41_VNM_1.json
 
 # Python
 __pycache__/
