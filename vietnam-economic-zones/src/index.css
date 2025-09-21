@@ -1,0 +1,79 @@
+/* Import external CSS first */
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Vietnam-inspired global theme */
+:root {
+  /* Vietnam color palette */
+  --color-vietnam-red: #da020e;
+  --color-vietnam-yellow: #ffcd00;
+  --color-mekong-blue: #1e40af;
+  --color-rice-green: #16a34a;
+  --color-mountain-gray: #6b7280;
+
+  /* Economic zone colors */
+  --zone-1-color: #ef4444;
+  --zone-2-color: #f97316;
+  --zone-3-color: #eab308;
+  --zone-4-color: #22c55e;
+  --zone-5-color: #3b82f6;
+  --zone-6-color: #8b5cf6;
+
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Component styles */
+.zone-card {
+  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200;
+  @apply border-l-4 border-transparent hover:border-blue-500;
+}
+
+.zone-card.selected {
+  @apply border-blue-500 bg-blue-50;
+}
+
+.map-overlay {
+  @apply absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg;
+  @apply border border-gray-200 max-w-sm;
+}
+
+/* Educational accessibility */
+.high-contrast {
+  filter: contrast(1.2);
+}
+
+/* Focus management */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Zone tooltip styles */
+.zone-tooltip {
+  @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+  @apply px-3 py-2 text-sm;
+  @apply backdrop-blur-sm bg-white/95;
+}
+
+.zone-tooltip .leaflet-tooltip-content {
+  @apply m-0 p-0;
+}
+
+/* Map border styles for better visibility */
+.leaflet-container {
+  @apply font-sans;
+}
+
+/* Custom GeoJSON layer styles */
+.economic-zone-border {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.economic-zone-border:hover {
+  filter: brightness(1.1);
+}

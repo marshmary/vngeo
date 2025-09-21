@@ -1,0 +1,70 @@
+{
+  "header": {
+    "title": "Khám Phá Các Vùng Kinh Tế Việt Nam",
+    "subtitle": "Công cụ giáo dục cho học sinh trung học phổ thông"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ"
+  },
+  "map": {
+    "title": "Bản Đồ Tương Tác",
+    "instructions": {
+      "title": "Hướng dẫn sử dụng bản đồ:",
+      "hover": "• Di chuột qua các vùng để xem thông tin nhanh",
+      "click": "• Nhấp vào vùng để chọn và phóng to",
+      "controls": "• Sử dụng các nút điều khiển để điều hướng",
+      "deselect": "• Nhấp vào vùng trống để bỏ chọn"
+    },
+    "loading": "Đang tải bản đồ...",
+    "error": "Lỗi tải bản đồ",
+    "tryAgain": "Thử lại",
+    "resetView": "Đặt lại bản đồ"
+  },
+  "zones": {
+    "title": "Các Vùng Kinh Tế",
+    "subtitle": "Chọn một vùng để xem chi tiết",
+    "selectedDetails": "Chi Tiết Vùng Được Chọn",
+    "closeDetails": "Đóng chi tiết vùng",
+    "statistics": "Thống Kê Chính",
+    "industries": "Ngành Công Nghiệp",
+    "majorCities": "Thành Phố Chính",
+    "economicStructure": "Cơ Cấu Kinh Tế",
+    "mapColor": "Màu vùng trên bản đồ",
+    "clickToExplore": "Nhấp để khám phá",
+    "population": "Dân số",
+    "area": "Diện tích",
+    "established": "Thành lập",
+    "region": "Vùng",
+    "agriculture": "Nông nghiệp",
+    "industry": "Công nghiệp",
+    "services": "Dịch vụ",
+    "selectZone": "Chọn vùng kinh tế {{zoneName}}",
+    "selectedZone": "Đã chọn {{zoneName}}",
+    "clickMarkerDetails": "Nhấp vào điểm đánh dấu trên bản đồ để xem thêm chi tiết →"
+  },
+  "loading": {
+    "loadingMap": "Đang tải bản đồ...",
+    "loadingApplication": "Đang tải ứng dụng..."
+  },
+  "error": {
+    "loadingApplication": "Lỗi Tải Ứng Dụng",
+    "loadingMapData": "Lỗi tải dữ liệu bản đồ",
+    "tryAgain": "Thử Lại"
+  },
+  "footer": {
+    "copyright": "© 2025 Khám Phá Các Vùng Kinh Tế Việt Nam - Công cụ giáo dục"
+  },
+  "notifications": {
+    "mapReset": "Đã đặt lại bản đồ",
+    "zoneSelected": "Đã chọn {{zoneName}}",
+    "errorLoadingData": "Lỗi tải dữ liệu bản đồ"
+  },
+  "tips": {
+    "howToUse": "💡 Mẹo sử dụng:",
+    "hoverInfo": "• Di chuột để xem thông tin",
+    "clickSelect": "• Nhấp để chọn vùng",
+    "scrollZoom": "• Cuộn để phong to/thu nhỏ"
+  }
+}

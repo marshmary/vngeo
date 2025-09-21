@@ -1,0 +1,70 @@
+{
+  "header": {
+    "title": "Vietnam Economic Zones Explorer",
+    "subtitle": "Educational Tool for High School Students"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "map": {
+    "title": "Interactive Map",
+    "instructions": {
+      "title": "How to use the interactive map:",
+      "hover": "• Hover over zones for quick info",
+      "click": "• Click zones to select and zoom",
+      "controls": "• Use controls for navigation",
+      "deselect": "• Click empty area to deselect"
+    },
+    "loading": "Loading map...",
+    "error": "Error loading map",
+    "tryAgain": "Try Again",
+    "resetView": "Reset map view"
+  },
+  "zones": {
+    "title": "Economic Zones",
+    "subtitle": "Select a zone to view details",
+    "selectedDetails": "Selected Zone Details",
+    "closeDetails": "Close zone details",
+    "statistics": "Key Statistics",
+    "industries": "Industries",
+    "majorCities": "Major Cities",
+    "economicStructure": "Economic Structure",
+    "mapColor": "Zone color on map",
+    "clickToExplore": "Click to explore",
+    "population": "Population",
+    "area": "Area",
+    "established": "Established",
+    "region": "Region",
+    "agriculture": "Agriculture",
+    "industry": "Industry",
+    "services": "Services",
+    "selectZone": "Select {{zoneName}} economic zone",
+    "selectedZone": "Selected {{zoneName}}",
+    "clickMarkerDetails": "Click on map marker for more details →"
+  },
+  "loading": {
+    "loadingMap": "Loading map...",
+    "loadingApplication": "Loading application..."
+  },
+  "error": {
+    "loadingApplication": "Error Loading Application",
+    "loadingMapData": "Error loading map data",
+    "tryAgain": "Try Again"
+  },
+  "footer": {
+    "copyright": "© 2025 Vietnam Economic Zones Explorer - Educational Tool"
+  },
+  "notifications": {
+    "mapReset": "Map view reset",
+    "zoneSelected": "Selected {{zoneName}}",
+    "errorLoadingData": "Error loading map data"
+  },
+  "tips": {
+    "howToUse": "💡 How to use:",
+    "hoverInfo": "• Hover to see zone info",
+    "clickSelect": "• Click to select zone",
+    "scrollZoom": "• Scroll to zoom in/out"
+  }
+}
