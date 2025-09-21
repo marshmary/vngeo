@@ -1,5 +1,5 @@
 // Economic zone to province mapping based on Vietnam's official regional classification
-export const ZONE_PROVINCES = {
+export const ZONE_PROVINCES: Record<string, string[]> = {
   'zone-1': [
     'HàGiang',
     'CaoBằng',
@@ -74,9 +74,9 @@ export const ZONE_PROVINCES = {
     'BạcLiêu',
     'CàMau'
   ]
-} as const;
+};
 
-export const ZONE_METADATA = {
+export const ZONE_METADATA: Record<string, { name: string; nameVi: string; color: string }> = {
   'zone-1': {
     name: 'Northern Mountains and Midlands',
     nameVi: 'Trung du và miền núi phía Bắc',
@@ -107,6 +107,6 @@ export const ZONE_METADATA = {
     nameVi: 'Đồng bằng sông Cửu Long',
     color: '#8b5cf6'
   }
-} as const;
+};
 
-export type ZoneId = keyof typeof ZONE_PROVINCES;
+export type ZoneId = 'zone-1' | 'zone-2' | 'zone-3' | 'zone-4' | 'zone-5' | 'zone-6';

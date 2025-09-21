@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useMapStore } from '@/stores/mapStore';
-import ZoneLayer from '../ZoneLayer';
+import ZoneLayer from './ZoneLayer';
 import ProvinceDebugger from '../debug/ProvinceDebugger';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for default markers in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -42,9 +42,7 @@ const VietnamMap: React.FC = () => {
     isLoading,
     error,
     loadZones,
-    setSelectedZone,
-    setMapCenter,
-    setZoomLevel
+    setSelectedZone
   } = useMapStore();
 
   useEffect(() => {
@@ -91,15 +89,7 @@ const VietnamMap: React.FC = () => {
         style={{ height: '100%', width: '100%' }}
         zoomControl={true}
         scrollWheelZoom={true}
-        onZoomEnd={(e) => {
-          const map = e.target;
-          setZoomLevel(map.getZoom());
-        }}
-        onMoveEnd={(e) => {
-          const map = e.target;
-          const center = map.getCenter();
-          setMapCenter([center.lat, center.lng]);
-        }}
+        // Event handlers will be managed by MapEventHandler component
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

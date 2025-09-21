@@ -64,7 +64,10 @@ class GADMService {
       while (this.loading) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      return this.gadmData!;
+      if (this.gadmData) {
+        return this.gadmData;
+      }
+      throw new Error('Failed to load GADM data');
     }
 
     try {
@@ -79,7 +82,7 @@ class GADMService {
       this.gadmData = await response.json();
       console.log(`Loaded ${this.gadmData!.features.length} administrative features`);
 
-      return this.gadmData;
+      return this.gadmData as GADMData;
     } catch (error) {
       console.error('Error loading GADM data:', error);
       throw error;
@@ -101,7 +104,7 @@ class GADMService {
       if (feature.geometry.type === 'MultiPolygon') {
         allCoordinates.push(...feature.geometry.coordinates as number[][][][]);
       } else if (feature.geometry.type === 'Polygon') {
-        allCoordinates.push([feature.geometry.coordinates as number[][][]]);
+        allCoordinates.push(feature.geometry.coordinates as number[][][]);
       }
     });
 
@@ -115,7 +118,7 @@ class GADMService {
       const metadata = ZONE_METADATA[zoneId as ZoneId];
 
       // Filter GADM features for this zone's provinces
-      const provinceFeatures = this.filterFeaturesByProvince(gadmData, provinces);
+      const provinceFeatures = this.filterFeaturesByProvince(gadmData, [...provinces]);
 
       // Merge all province geometries into a single MultiPolygon
       const mergedCoordinates = this.mergeProvinceGeometries(provinceFeatures);
@@ -127,7 +130,7 @@ class GADMService {
           name: metadata.name,
           nameVi: metadata.nameVi,
           color: metadata.color,
-          provinces: provinces
+          provinces: [...provinces]
         },
         geometry: {
           type: 'MultiPolygon' as const,

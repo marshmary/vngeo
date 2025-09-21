@@ -73,7 +73,12 @@ const ZoneLayer: React.FC = () => {
   };
 
   // Style function for economic zone borders
-  const zoneStyle = (feature: any) => {
+  const zoneStyle = (feature: {
+    properties: {
+      id: string;
+      color?: string;
+    };
+  }) => {
     const isSelected = feature.properties.id === selectedZone;
     return {
       color: feature.properties.color || '#374151',
@@ -86,11 +91,18 @@ const ZoneLayer: React.FC = () => {
   };
 
   // Event handlers for zone interactions
-  const onEachZone = (feature: any, layer: L.Layer) => {
+  const onEachZone = (feature: {
+    properties: {
+      id?: string;
+      name?: string;
+      nameVi?: string;
+      provinces?: string[];
+    };
+  }, layer: L.Layer) => {
     if (feature.properties.id) {
       layer.on({
         click: () => {
-          setSelectedZone(feature.properties.id);
+          setSelectedZone(feature.properties.id || null);
         },
         mouseover: (e) => {
           const layer = e.target;
@@ -100,23 +112,16 @@ const ZoneLayer: React.FC = () => {
             fillOpacity: 0.3
           });
         },
-        mouseout: (e) => {
-          // Reset style when mouse leaves
-          if (zoneBoundaries) {
-            const geoJsonLayer = e.target._map._layers;
-            Object.values(geoJsonLayer).forEach((mapLayer: any) => {
-              if (mapLayer._geojson === zoneBoundaries) {
-                mapLayer.resetStyle(e.target);
-              }
-            });
-          }
+        mouseout: () => {
+          // Reset style when mouse leaves - will be handled by the GeoJSON layer
         }
       });
 
       // Add tooltip with province information
-      const provinceList = feature.properties.provinces?.slice(0, 5).join(', ') || '';
-      const remainingCount = feature.properties.provinces?.length > 5
-        ? ` + ${feature.properties.provinces.length - 5} more`
+      const provinces = feature.properties.provinces || [];
+      const provinceList = provinces.slice(0, 5).join(', ');
+      const remainingCount = provinces.length > 5
+        ? ` + ${provinces.length - 5} more`
         : '';
 
       layer.bindTooltip(
@@ -159,7 +164,10 @@ const ZoneLayer: React.FC = () => {
         <GeoJSON
           key={`zone-borders-${selectedZone || 'none'}`}
           data={zoneBoundaries}
-          style={zoneStyle}
+          style={(feature) => {
+            if (!feature) return {};
+            return zoneStyle(feature);
+          }}
           onEachFeature={onEachZone}
         />
       )}

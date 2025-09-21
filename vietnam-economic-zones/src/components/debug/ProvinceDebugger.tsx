@@ -15,7 +15,7 @@ const ProvinceDebugger: React.FC = () => {
 
         // Check mapping coverage
         Object.entries(ZONE_PROVINCES).forEach(([zoneId, zoneProvinces]) => {
-          const unmatchedProvinces = zoneProvinces.filter(p => !provinceList.includes(p));
+          const unmatchedProvinces = zoneProvinces.filter((p: string) => !provinceList.includes(p));
           if (unmatchedProvinces.length > 0) {
             console.warn(`Zone ${zoneId} has unmatched provinces:`, unmatchedProvinces);
           } else {

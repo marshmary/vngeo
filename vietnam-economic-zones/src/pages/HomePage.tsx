@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import InteractiveMapContainer from '@/components/map/InteractiveMapContainer';
 import ZoneCard from '@/components/zone/ZoneCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import Notification from '@/components/common/Notification';
 import { useMapStore } from '@/stores/mapStore';
 import { useUIStore } from '@/stores/uiStore';
 
@@ -14,8 +13,7 @@ const HomePage: React.FC = () => {
     error,
     loadZones,
     getZoneById,
-    setSelectedZone,
-    resetMapState
+    setSelectedZone
   } = useMapStore();
 
   const { language } = useUIStore();

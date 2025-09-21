@@ -8,7 +8,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -29,7 +29,7 @@ const MapEventHandler: React.FC = () => {
       const map = e.target;
       setZoomLevel(map.getZoom());
     },
-    click: (e) => {
+    click: () => {
       // Click on empty map area deselects zone
       setSelectedZone(null);
     }
@@ -97,10 +97,15 @@ const MapControls: React.FC = () => {
 };
 
 // Zone tooltip component
-const ZoneTooltip: React.FC<{
-  zone: any;
+interface ZoneTooltipProps {
+  zone: {
+    name: string;
+    nameVi: string;
+  } | null;
   mousePosition: { x: number; y: number } | null;
-}> = ({ zone, mousePosition }) => {
+}
+
+const ZoneTooltip: React.FC<ZoneTooltipProps> = ({ zone, mousePosition }) => {
   const { language } = useUIStore();
 
   if (!zone || !mousePosition) return null;
@@ -140,7 +145,7 @@ const InteractiveMapContainer: React.FC = () => {
   const { showNotification, language } = useUIStore();
 
   const [geoJsonData, setGeoJsonData] = useState<ZoneGeoJSON | null>(null);
-  const [hoveredZone, setHoveredZone] = useState<any>(null);
+  const [hoveredZone, setHoveredZone] = useState<{ name: string; nameVi: string } | null>(null);
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [isLoadingBoundaries, setIsLoadingBoundaries] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
@@ -188,7 +193,13 @@ const InteractiveMapContainer: React.FC = () => {
   }, []);
 
   // GeoJSON layer styling and interactions
-  const onEachFeature = (feature: any, layer: L.Layer) => {
+  const onEachFeature = (feature: {
+    properties: {
+      id: string;
+      color: string;
+      provinces?: string[];
+    };
+  }, layer: L.Layer) => {
     const zoneId = feature.properties.id;
     const zoneMetadata = ZONE_METADATA[zoneId as keyof typeof ZONE_METADATA];
     const zone = getZoneById(zoneId);
@@ -248,9 +259,10 @@ const InteractiveMapContainer: React.FC = () => {
     });
 
     // Enhanced popup with province information
-    const provinceList = feature.properties.provinces?.slice(0, 5).join(', ') || '';
-    const remainingCount = feature.properties.provinces?.length > 5
-      ? ` + ${feature.properties.provinces.length - 5} more`
+    const provinces = feature.properties.provinces || [];
+    const provinceList = provinces.slice(0, 5).join(', ');
+    const remainingCount = provinces.length > 5
+      ? ` + ${provinces.length - 5} more`
       : '';
 
     const popupContent = `
@@ -294,7 +306,12 @@ const InteractiveMapContainer: React.FC = () => {
     fillOpacity: isSelected ? 0.3 : 0.1
   });
 
-  const geoJsonStyle = (feature: any) => {
+  const geoJsonStyle = (feature: {
+    properties: {
+      id: string;
+      color: string;
+    };
+  }) => {
     const isSelected = feature.properties.id === selectedZone;
     return {
       fillColor: feature.properties.color,
@@ -366,7 +383,10 @@ const InteractiveMapContainer: React.FC = () => {
         {geoJsonData && (
           <GeoJSON
             data={geoJsonData}
-            style={geoJsonStyle}
+            style={(feature) => {
+            if (!feature) return {};
+            return geoJsonStyle(feature);
+          }}
             onEachFeature={onEachFeature}
           />
         )}

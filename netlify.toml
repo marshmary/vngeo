@@ -1,0 +1,10 @@
+[build]
+  base = "vietnam-economic-zones"
+  command = "npm run build"
+  publish = "vietnam-economic-zones/dist"
+  functions = "vietnam-economic-zones/netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

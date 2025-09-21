@@ -38,7 +38,6 @@ i18n
     ns: ['translation'],
 
     // Return key if translation is missing
-    returnKeyIfEmpty: true,
     returnEmptyString: false,
   });
 

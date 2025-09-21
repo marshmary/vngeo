@@ -1,4 +1,4 @@
-import React from 'react';
+// Remove unused React import as JSX transform handles it
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Notification from './components/common/Notification';
