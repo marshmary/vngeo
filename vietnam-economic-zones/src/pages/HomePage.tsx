@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import InteractiveMapContainer from '@/components/map/InteractiveMapContainer';
-import ZoneCard from '@/components/zone/ZoneCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useMapStore } from '@/stores/mapStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -17,6 +17,9 @@ const HomePage: React.FC = () => {
   } = useMapStore();
 
   const { language } = useUIStore();
+  const navigate = useNavigate();
+
+  const selectedZoneData = selectedZone ? getZoneById(selectedZone) : null;
 
   useEffect(() => {
     // Load zones on component mount
@@ -25,7 +28,15 @@ const HomePage: React.FC = () => {
     }
   }, [loadZones, zones.length]);
 
-  const selectedZoneData = selectedZone ? getZoneById(selectedZone) : null;
+  // Update page title based on selected zone
+  useEffect(() => {
+    if (selectedZoneData) {
+      document.title = `${language === 'vi' ? selectedZoneData.nameVi : selectedZoneData.name} - Viet Nam Economic Zone`;
+    } else {
+      document.title = 'Viet Nam Economic Zone';
+    }
+  }, [selectedZoneData, language]);
+
 
   if (error) {
     return (
@@ -52,60 +63,63 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-vietnam-red rounded mr-3 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">VN</span>
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {language === 'vi'
-                    ? 'Khám Phá Các Vùng Kinh Tế Việt Nam'
-                    : 'Vietnam Economic Zones Explorer'
-                  }
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {language === 'vi'
-                    ? 'Công cụ giáo dục cho học sinh trung học phổ thông'
-                    : 'Educational Tool for High School Students'
-                  }
-                </p>
-              </div>
+    <div className="main-container">
+      {/* Header with Logo and Navigation */}
+      <header className="navigation-header">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-lg">VN</span>
             </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                {language === 'vi' ? 'Vùng Kinh Tế Việt Nam' : 'Vietnam Economic Zones'}
+              </h1>
+            </div>
+          </div>
 
-            {/* Language Toggle */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => useUIStore.getState().setLanguage('vi')}
-                className={`px-3 py-1 text-sm rounded ${
-                  language === 'vi'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                } focus-ring`}
-              >
-                VI
-              </button>
-              <button
-                onClick={() => useUIStore.getState().setLanguage('en')}
-                className={`px-3 py-1 text-sm rounded ${
-                  language === 'en'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                } focus-ring`}
-              >
-                EN
-              </button>
-            </div>
+          {/* Navigation Tabs */}
+          <nav className="flex space-x-1">
+            <button className="nav-tab active">
+              {language === 'vi' ? 'BẢN ĐỒ' : 'MAP'}
+            </button>
+            <button
+              className="nav-tab"
+              onClick={() => navigate('/documents')}
+            >
+              {language === 'vi' ? 'TÀI LIỆU' : 'DOCUMENTS'}
+            </button>
+          </nav>
+
+          {/* Language Toggle */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => useUIStore.getState().setLanguage('vi')}
+              className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
+                language === 'vi'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              VI
+            </button>
+            <button
+              onClick={() => useUIStore.getState().setLanguage('en')}
+              className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
+                language === 'en'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              EN
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="p-8">
         {isLoading ? (
           <div className="flex justify-center py-12">
             <LoadingSpinner
@@ -114,263 +128,200 @@ const HomePage: React.FC = () => {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Main Content: Map and Zone Details */}
-            <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                  {language === 'vi' ? 'Bản Đồ Tương Tác' : 'Interactive Map'}
-                </h2>
-
-                {/* Map Container */}
-                <div className="mb-6">
-                  <InteractiveMapContainer />
-                </div>
-
-                {/* Enhanced Map Instructions */}
-                <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border-l-4 border-blue-400">
-                  <div className="flex items-start space-x-2">
-                    <div className="text-blue-600 mt-0.5">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-blue-800 mb-1">
-                        {language === 'vi' ? 'Hướng dẫn sử dụng bản đồ:' : 'How to use the interactive map:'}
-                      </p>
-                      <ul className="text-xs text-blue-700 space-y-1">
-                        <li>
-                          {language === 'vi'
-                            ? '• Di chuột qua các vùng để xem thông tin nhanh'
-                            : '• Hover over zones for quick info'
-                          }
-                        </li>
-                        <li>
-                          {language === 'vi'
-                            ? '• Nhấp vào vùng để chọn và phóng to'
-                            : '• Click zones to select and zoom'
-                          }
-                        </li>
-                        <li>
-                          {language === 'vi'
-                            ? '• Sử dụng các nút điều khiển để điều hướng'
-                            : '• Use controls for navigation'
-                          }
-                        </li>
-                        <li>
-                          {language === 'vi'
-                            ? '• Nhấp vào vùng trống để bỏ chọn'
-                            : '• Click empty area to deselect'
-                          }
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Zone Details Section - Inside Map Container */}
-                {selectedZoneData && (
-                  <div className="border-t border-gray-200 pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {language === 'vi' ? 'Chi Tiết Vùng Được Chọn' : 'Selected Zone Details'}
-                      </h3>
-                      <button
-                        onClick={() => setSelectedZone(null)}
-                        className="text-gray-400 hover:text-gray-600 focus-ring p-1 rounded"
-                        aria-label="Close zone details"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Zone Overview */}
-                      <div className="space-y-3">
-                        <div>
-                          <h4 className="font-medium text-gray-800">
-                            {selectedZoneData.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {language === 'vi' ? selectedZoneData.nameVi : selectedZoneData.name}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {selectedZoneData.region}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-sm text-gray-700 leading-relaxed">
-                            {language === 'vi' ? selectedZoneData.descriptionVi : selectedZoneData.description}
-                          </p>
-                        </div>
-
-                        {/* Zone Color Indicator */}
-                        <div className="flex items-center space-x-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: selectedZoneData.color }}
-                          ></div>
-                          <span className="text-xs text-gray-600">
-                            {language === 'vi' ? 'Màu vùng trên bản đồ' : 'Zone color on map'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Key Statistics */}
-                      <div>
-                        <h5 className="font-medium text-gray-800 mb-3 text-sm">
-                          {language === 'vi' ? 'Thống Kê Chính' : 'Key Statistics'}
-                        </h5>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-blue-50 p-3 rounded border border-blue-100">
-                            <div className="text-xs font-medium text-blue-800">
-                              {language === 'vi' ? 'Dân số' : 'Population'}
-                            </div>
-                            <div className="text-lg font-bold text-blue-600">
-                              {(selectedZoneData.population / 1000000).toFixed(1)}M
-                            </div>
-                          </div>
-                          <div className="bg-green-50 p-3 rounded border border-green-100">
-                            <div className="text-xs font-medium text-green-800">GDP</div>
-                            <div className="text-lg font-bold text-green-600">
-                              ${(selectedZoneData.gdp / 1000000000).toFixed(1)}B
-                            </div>
-                          </div>
-                          <div className="bg-purple-50 p-3 rounded border border-purple-100">
-                            <div className="text-xs font-medium text-purple-800">
-                              {language === 'vi' ? 'Diện tích' : 'Area'}
-                            </div>
-                            <div className="text-lg font-bold text-purple-600">
-                              {selectedZoneData.area.toLocaleString()} km²
-                            </div>
-                          </div>
-                          <div className="bg-orange-50 p-3 rounded border border-orange-100">
-                            <div className="text-xs font-medium text-orange-800">
-                              {language === 'vi' ? 'Thành lập' : 'Established'}
-                            </div>
-                            <div className="text-lg font-bold text-orange-600">
-                              {selectedZoneData.establishedYear}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Industries and Cities */}
-                      <div className="space-y-4">
-                        {/* Industries */}
-                        <div>
-                          <h5 className="font-medium text-gray-800 mb-2 text-sm">
-                            {language === 'vi' ? 'Ngành Công Nghiệp' : 'Industries'}
-                          </h5>
-                          <div className="flex flex-wrap gap-1">
-                            {selectedZoneData.industries.map((industry) => (
-                              <span
-                                key={industry}
-                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                              >
-                                {industry}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Major Cities */}
-                        <div>
-                          <h5 className="font-medium text-gray-800 mb-2 text-sm">
-                            {language === 'vi' ? 'Thành Phố Chính' : 'Major Cities'}
-                          </h5>
-                          <div className="flex flex-wrap gap-1">
-                            {selectedZoneData.majorCities.map((city) => (
-                              <span
-                                key={city}
-                                className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
-                              >
-                                {city}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Economic Activities */}
-                        <div>
-                          <h5 className="font-medium text-gray-800 mb-2 text-sm">
-                            {language === 'vi' ? 'Cơ Cấu Kinh Tế' : 'Economic Structure'}
-                          </h5>
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">
-                                {language === 'vi' ? 'Nông nghiệp' : 'Agriculture'}
-                              </span>
-                              <span className="text-xs font-medium text-green-600">
-                                {selectedZoneData.economicActivities.agriculture}%
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">
-                                {language === 'vi' ? 'Công nghiệp' : 'Industry'}
-                              </span>
-                              <span className="text-xs font-medium text-blue-600">
-                                {selectedZoneData.economicActivities.industry}%
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">
-                                {language === 'vi' ? 'Dịch vụ' : 'Services'}
-                              </span>
-                              <span className="text-xs font-medium text-purple-600">
-                                {selectedZoneData.economicActivities.services}%
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+          <div className="flex gap-6">
+            {/* Map Container - Main Area */}
+            <div className="flex-1">
+              <div className="map-container-modern">
+                <InteractiveMapContainer />
               </div>
             </div>
 
-            {/* Fixed Scrollable Zone List Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow">
-                <div className="p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {language === 'vi' ? 'Các Vùng Kinh Tế' : 'Economic Zones'}
+            {/* Information Sidebar - Hidden on mobile, visible from iPad Pro up */}
+            <div className="info-panel hidden xl:block">
+              {selectedZoneData ? (
+                <>
+                  {/* Close Button */}
+                  <div className="flex justify-end mb-4">
+                    <button
+                      onClick={() => setSelectedZone(null)}
+                      className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Zone Header */}
+                  <div className="mb-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                      {selectedZoneData.name}
+                    </h3>
+                    <p className="text-gray-600 mb-1">
+                      {language === 'vi' ? selectedZoneData.nameVi : selectedZoneData.name}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-3">
+                      {selectedZoneData.region}
+                    </p>
+                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                      {language === 'vi' ? selectedZoneData.descriptionVi : selectedZoneData.description}
+                    </p>
+
+                    {/* Zone Color Indicator */}
+                    <div className="flex items-center space-x-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: selectedZoneData.color }}
+                      ></div>
+                      <span className="text-xs text-gray-600">
+                        {language === 'vi' ? 'Màu vùng trên bản đồ' : 'Zone color on map'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Key Statistics */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                      {language === 'vi' ? 'Thống Kê Chính' : 'Key Statistics'}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Population */}
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <div className="text-xs text-blue-800 font-medium mb-1">
+                          {language === 'vi' ? 'Dân số' : 'Population'}
+                        </div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {(selectedZoneData.population / 1000000).toFixed(1)}M
+                        </div>
+                      </div>
+
+                      {/* GDP */}
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                        <div className="text-xs text-green-800 font-medium mb-1">GDP</div>
+                        <div className="text-lg font-bold text-green-600">
+                          ${(selectedZoneData.gdp / 1000000000).toFixed(1)}B
+                        </div>
+                      </div>
+
+                      {/* Area */}
+                      <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                        <div className="text-xs text-purple-800 font-medium mb-1">
+                          {language === 'vi' ? 'Diện tích' : 'Area'}
+                        </div>
+                        <div className="text-lg font-bold text-purple-600">
+                          {selectedZoneData.area.toLocaleString()} km²
+                        </div>
+                      </div>
+
+                      {/* Established */}
+                      <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                        <div className="text-xs text-orange-800 font-medium mb-1">
+                          {language === 'vi' ? 'Thành lập' : 'Established'}
+                        </div>
+                        <div className="text-lg font-bold text-orange-600">
+                          {selectedZoneData.establishedYear}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Industries */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                      {language === 'vi' ? 'Ngành Công Nghiệp' : 'Industries'}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedZoneData.industries.map((industry) => (
+                        <span
+                          key={industry}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium"
+                        >
+                          {industry}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+
+                  {/* Economic Structure */}
+                  <div className="mb-4">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                      {language === 'vi' ? 'Cơ Cấu Kinh Tế' : 'Economic Structure'}
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">
+                          {language === 'vi' ? 'Nông nghiệp' : 'Agriculture'}
+                        </span>
+                        <span className="text-sm font-semibold text-green-600">
+                          {selectedZoneData.economicActivities.agriculture}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">
+                          {language === 'vi' ? 'Công nghiệp' : 'Industry'}
+                        </span>
+                        <span className="text-sm font-semibold text-blue-600">
+                          {selectedZoneData.economicActivities.industry}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">
+                          {language === 'vi' ? 'Dịch vụ' : 'Services'}
+                        </span>
+                        <span className="text-sm font-semibold text-purple-600">
+                          {selectedZoneData.economicActivities.services}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {language === 'vi' ? 'Chọn một vùng kinh tế' : 'Select an Economic Zone'}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {language === 'vi' ? 'Chọn một vùng để xem chi tiết' : 'Select a zone to view details'}
+                  <p className="text-sm text-gray-600 mb-4">
+                    {language === 'vi'
+                      ? 'Nhấp vào các vùng màu trên bản đồ để xem thông tin chi tiết'
+                      : 'Click on colored regions on the map to view detailed information'
+                    }
                   </p>
-                </div>
-                <div className="h-96 overflow-y-auto p-4">
-                  <div className="space-y-3">
+
+                  {/* Quick Zone List */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'vi' ? 'Tất cả vùng kinh tế:' : 'All Economic Zones:'}
+                    </h4>
                     {zones.map((zone) => (
-                      <ZoneCard key={zone.id} zone={zone} />
+                      <button
+                        key={zone.id}
+                        onClick={() => setSelectedZone(zone.id)}
+                        className="w-full text-left p-2 rounded-lg hover:bg-gray-50 border border-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: zone.color }}
+                          ></div>
+                          <span className="text-sm font-medium text-gray-700">
+                            {language === 'vi' ? zone.nameVi : zone.name}
+                          </span>
+                        </div>
+                      </button>
                     ))}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="text-center text-sm text-gray-600">
-            <p>
-              {language === 'vi'
-                ? '© 2025 Khám Phá Các Vùng Kinh Tế Việt Nam - Công cụ giáo dục'
-                : '© 2025 Vietnam Economic Zones Explorer - Educational Tool'
-              }
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

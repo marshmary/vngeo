@@ -274,19 +274,19 @@ const InteractiveMapContainer: React.FC = () => {
           ${zoneMetadata.nameVi}
         </p>
         ${zone ? `
-          <div class="space-y-1 text-xs text-gray-700 mb-2">
+          <div class="space-y-1 text-xs text-gray-700">
             <p><strong>Population:</strong> ${(zone.population / 1000000).toFixed(1)}M</p>
             <p><strong>GDP:</strong> $${(zone.gdp / 1000000000).toFixed(1)}B</p>
             <p><strong>Area:</strong> ${zone.area.toLocaleString()} km²</p>
           </div>
-          <div class="mb-2 flex flex-wrap gap-1">
+          <div class="mt-2 flex flex-wrap gap-1">
             ${zone.industries.slice(0, 3).map((industry: string) =>
               `<span class="px-2 py-1 bg-gray-100 text-xs rounded">${industry}</span>`
             ).join('')}
           </div>
         ` : ''}
         ${provinceList ? `
-          <div class="border-t pt-2">
+          <div class="border-t pt-2 mt-2">
             <p class="text-xs font-medium text-gray-700 mb-1">Provinces:</p>
             <p class="text-xs text-gray-600">${provinceList}${remainingCount}</p>
           </div>
@@ -361,7 +361,7 @@ const InteractiveMapContainer: React.FC = () => {
   }
 
   return (
-    <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
+    <div className="relative h-full w-full rounded-2xl overflow-hidden">
       <MapContainer
         center={mapCenter}
         zoom={zoomLevel}
@@ -398,28 +398,32 @@ const InteractiveMapContainer: React.FC = () => {
       {/* Zone tooltip */}
       <ZoneTooltip zone={hoveredZone} mousePosition={mousePosition} />
 
-      {/* Map legend */}
-      <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-gray-200 max-w-xs">
-        <h4 className="font-semibold text-sm mb-2 text-gray-800">
-          {language === 'vi' ? 'Chú thích' : 'Legend'}
-        </h4>
-        <div className="space-y-1 text-xs">
-          {Object.entries(ZONE_METADATA).slice(0, 3).map(([zoneId, metadata]) => (
-            <div key={zoneId} className="flex items-center space-x-2">
+      {/* Economic Zone Legend */}
+      <div className="legend-container">
+        <div className="mb-3">
+          <h4 className="font-semibold text-sm text-gray-900">
+            {language === 'vi' ? 'VÙNG KINH TẾ' : 'ECONOMIC ZONES'}
+          </h4>
+        </div>
+
+        <div className="space-y-2">
+          {Object.entries(ZONE_METADATA).map(([zoneId, metadata]) => (
+            <button
+              key={zoneId}
+              onClick={() => setSelectedZone(zoneId)}
+              className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200 hover:bg-gray-50 ${
+                selectedZone === zoneId ? 'bg-blue-50 border border-blue-200' : ''
+              }`}
+            >
               <div
-                className="w-3 h-3 rounded"
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: metadata.color }}
               ></div>
-              <span className="text-gray-700">
+              <span className="text-xs text-gray-700 font-medium">
                 {language === 'vi' ? metadata.nameVi : metadata.name}
               </span>
-            </div>
+            </button>
           ))}
-          {Object.keys(ZONE_METADATA).length > 3 && (
-            <div className="text-gray-500 italic">
-              {language === 'vi' ? `+${Object.keys(ZONE_METADATA).length - 3} vùng khác` : `+${Object.keys(ZONE_METADATA).length - 3} more zones`}
-            </div>
-          )}
         </div>
       </div>
 
