@@ -85,7 +85,7 @@ export const initializeAuth = async () => {
   }
 
   // Listen for auth changes
-  AuthService.onAuthStateChange((event, session) => {
+  AuthService.onAuthStateChange((_event, session) => {
     if (session) {
       setUser(session.user);
       setSession(session);
