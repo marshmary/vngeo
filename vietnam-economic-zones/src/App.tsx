@@ -1,17 +1,55 @@
 // Remove unused React import as JSX transform handles it
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import DocumentsPage from './pages/DocumentsPage';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import NavBar from './components/common/NavBar';
 import Notification from './components/common/Notification';
+import { initializeAuth } from './stores/authStore';
 import './index.css';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const showNavBar = location.pathname !== '/login';
+  const isMapPage = location.pathname === '/';
+
+  // Prevent body scroll on map page
+  useEffect(() => {
+    if (isMapPage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMapPage]);
+
   return (
-    <Router>
-      <div className="gradient-background">
+    <>
+      {showNavBar && <NavBar />}
+      <div className={`gradient-background ${showNavBar && !isMapPage ? 'pt-20' : ''} ${isMapPage ? 'h-screen overflow-hidden' : ''}`}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/documents" element={<DocumentsPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/documents"
+            element={
+              <ProtectedRoute>
+                <DocumentsPage />
+              </ProtectedRoute>
+            }
+          />
           {/* Future routes will be added here:
               - /zones/:zoneId - Zone detail page
               - /zones/:zoneId/documents - Documents page
@@ -21,6 +59,18 @@ function App() {
         </Routes>
         <Notification />
       </div>
+    </>
+  );
+}
+
+function App() {
+  useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

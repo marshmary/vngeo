@@ -96,7 +96,7 @@
 
 /* Modern deepbreath layout styles */
 .gradient-background {
-  background: var(--bg-gradient);
+  background: #ffffff;
   min-height: 100vh;
 }
 

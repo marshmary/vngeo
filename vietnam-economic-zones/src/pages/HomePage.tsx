@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import InteractiveMapContainer from '@/components/map/InteractiveMapContainer';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useMapStore } from '@/stores/mapStore';
@@ -17,7 +16,6 @@ const HomePage: React.FC = () => {
   } = useMapStore();
 
   const { language } = useUIStore();
-  const navigate = useNavigate();
 
   const selectedZoneData = selectedZone ? getZoneById(selectedZone) : null;
 
@@ -63,81 +61,25 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="main-container">
-      {/* Header with Logo and Navigation */}
-      <header className="navigation-header">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">VN</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                {language === 'vi' ? 'Vùng Kinh Tế Việt Nam' : 'Vietnam Economic Zones'}
-              </h1>
-            </div>
-          </div>
-
-          {/* Navigation Tabs */}
-          <nav className="flex space-x-1">
-            <button className="nav-tab active">
-              {language === 'vi' ? 'BẢN ĐỒ' : 'MAP'}
-            </button>
-            <button
-              className="nav-tab"
-              onClick={() => navigate('/documents')}
-            >
-              {language === 'vi' ? 'TÀI LIỆU' : 'DOCUMENTS'}
-            </button>
-          </nav>
-
-          {/* Language Toggle */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => useUIStore.getState().setLanguage('vi')}
-              className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
-                language === 'vi'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              VI
-            </button>
-            <button
-              onClick={() => useUIStore.getState().setLanguage('en')}
-              className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
-                language === 'en'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="fixed top-20 left-0 right-0 bottom-0 overflow-hidden">
       {/* Main Content */}
-      <main className="p-8">
+      <main className="h-full flex">
         {isLoading ? (
-          <div className="flex justify-center py-12">
+          <div className="flex-1 flex justify-center items-center">
             <LoadingSpinner
               size="lg"
               message={language === 'vi' ? 'Đang tải bản đồ...' : 'Loading map...'}
             />
           </div>
         ) : (
-          <div className="flex gap-6">
+          <>
             {/* Map Container - Main Area */}
-            <div className="flex-1">
-              <div className="map-container-modern">
-                <InteractiveMapContainer />
-              </div>
+            <div className="flex-1 relative">
+              <InteractiveMapContainer />
             </div>
 
             {/* Information Sidebar - Hidden on mobile, visible from iPad Pro up */}
-            <div className="info-panel hidden xl:block">
+            <div className="hidden xl:block w-96 bg-white shadow-xl border-l border-gray-200 overflow-y-auto p-6">
               {selectedZoneData ? (
                 <>
                   {/* Close Button */}
@@ -319,7 +261,7 @@ const HomePage: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
+          </>
         )}
       </main>
     </div>
