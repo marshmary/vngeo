@@ -5,6 +5,7 @@ export interface AuthState {
   session: Session | null;
   isLoading: boolean;
   error: string | null;
+  isAdmin: boolean;
 }
 
 export interface AuthActions {

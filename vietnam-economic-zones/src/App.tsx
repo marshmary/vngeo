@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import HomePage from './pages/HomePage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
+import AdminPage from './pages/AdminPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 import NavBar from './components/common/NavBar';
 import Notification from './components/common/Notification';
 import { initializeAuth } from './stores/authStore';
@@ -50,11 +52,18 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
+          />
           {/* Future routes will be added here:
               - /zones/:zoneId - Zone detail page
               - /zones/:zoneId/documents - Documents page
               - /zones/:zoneId/qa - Q&A page
-              - /admin - Admin dashboard
           */}
         </Routes>
         <Notification />

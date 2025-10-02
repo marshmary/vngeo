@@ -13,13 +13,15 @@ export const useAuthStore = create<AuthStore>()(
       session: null,
       isLoading: true,
       error: null,
+      isAdmin: false,
 
       // Actions
       signIn: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
           const { user, session } = await AuthService.signIn({ email, password });
-          set({ user, session, isLoading: false });
+          const isAdmin = await AuthService.checkIsAdmin(user.id);
+          set({ user, session, isAdmin, isLoading: false });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
           set({ error: errorMessage, isLoading: false });
@@ -43,7 +45,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           await AuthService.signOut();
-          set({ user: null, session: null, isLoading: false });
+          set({ user: null, session: null, isAdmin: false, isLoading: false });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
           set({ error: errorMessage, isLoading: false });
@@ -62,6 +64,7 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         session: state.session,
+        isAdmin: state.isAdmin,
       }),
     }
   )
@@ -69,29 +72,34 @@ export const useAuthStore = create<AuthStore>()(
 
 // Initialize auth state on app load
 export const initializeAuth = async () => {
-  const { setUser, setSession, setLoading } = useAuthStore.getState();
+  const store = useAuthStore.getState();
 
   try {
     const session = await AuthService.getSession();
     if (session) {
       const user = await AuthService.getUser();
-      setUser(user);
-      setSession(session);
+      const isAdmin = await AuthService.checkIsAdmin(user.id);
+      store.setUser(user);
+      store.setSession(session);
+      useAuthStore.setState({ isAdmin });
     }
   } catch (error) {
     console.error('Failed to initialize auth:', error);
   } finally {
-    setLoading(false);
+    store.setLoading(false);
   }
 
   // Listen for auth changes
-  AuthService.onAuthStateChange((_event, session) => {
+  AuthService.onAuthStateChange(async (_event, session) => {
     if (session) {
-      setUser(session.user);
-      setSession(session);
+      const isAdmin = await AuthService.checkIsAdmin(session.user.id);
+      store.setUser(session.user);
+      store.setSession(session);
+      useAuthStore.setState({ isAdmin });
     } else {
-      setUser(null);
-      setSession(null);
+      store.setUser(null);
+      store.setSession(null);
+      useAuthStore.setState({ isAdmin: false });
     }
   });
 };
