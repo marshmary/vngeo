@@ -69,7 +69,7 @@ export class AuthService {
   /**
    * Check if user is admin using user metadata
    */
-  static async checkIsAdmin(userId: string): Promise<boolean> {
+  static async checkIsAdmin(): Promise<boolean> {
     try {
       const { data, error } = await supabase.auth.getUser();
 

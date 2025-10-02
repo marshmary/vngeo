@@ -76,7 +76,7 @@ export class DocumentService {
     const placeholderFile = new File([''], '.folderkeep', { type: 'text/plain' });
     const filePath = `${folderPath}/.folderkeep`;
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(this.BUCKET_NAME)
       .upload(filePath, placeholderFile, {
         cacheControl: '3600',

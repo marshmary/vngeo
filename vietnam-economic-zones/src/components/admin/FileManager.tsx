@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FileCard from './FileCard';
 import FileUpload from './FileUpload';
-import { DocumentService, StorageFile } from '@/services/documentService';
+import { DocumentService } from '@/services/documentService';
 import { useAuthStore } from '@/stores/authStore';
 
 export interface FileItem {
@@ -116,11 +116,6 @@ const FileManager: React.FC = () => {
     setCurrentPath(newPath);
   };
 
-  const handleNavigateUp = () => {
-    const pathParts = currentPath.split('/');
-    pathParts.pop();
-    setCurrentPath(pathParts.join('/'));
-  };
 
   const getFileType = (filename: string, mimetype?: string, metadata?: any): FileItem['type'] => {
     // Check if it's a folder using Supabase Storage conventions

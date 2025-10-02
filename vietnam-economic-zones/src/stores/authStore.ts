@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           const { user, session } = await AuthService.signIn({ email, password });
-          const isAdmin = await AuthService.checkIsAdmin(user.id);
+          const isAdmin = await AuthService.checkIsAdmin();
           set({ user, session, isAdmin, isLoading: false });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
@@ -78,7 +78,7 @@ export const initializeAuth = async () => {
     const session = await AuthService.getSession();
     if (session) {
       const user = await AuthService.getUser();
-      const isAdmin = await AuthService.checkIsAdmin(user.id);
+      const isAdmin = await AuthService.checkIsAdmin();
       store.setUser(user);
       store.setSession(session);
       useAuthStore.setState({ isAdmin });
@@ -92,7 +92,7 @@ export const initializeAuth = async () => {
   // Listen for auth changes
   AuthService.onAuthStateChange(async (_event, session) => {
     if (session) {
-      const isAdmin = await AuthService.checkIsAdmin(session.user.id);
+      const isAdmin = await AuthService.checkIsAdmin();
       store.setUser(session.user);
       store.setSession(session);
       useAuthStore.setState({ isAdmin });
