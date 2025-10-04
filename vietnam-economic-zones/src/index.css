@@ -166,3 +166,23 @@
   left: 20px;
   z-index: 1000;
 }
+
+/* Paracel Islands label styling */
+.paracel-label {
+  pointer-events: none !important;
+}
+
+.paracel-label div {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.2;
+}
+
+/* Spratly Islands label styling */
+.spratly-label {
+  pointer-events: none !important;
+}
+
+.spratly-label div {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.2;
+}

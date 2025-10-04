@@ -4,6 +4,8 @@ import { useMapStore } from '@/stores/mapStore';
 import { useUIStore } from '@/stores/uiStore';
 import { gadmService, type ZoneGeoJSON } from '@/services/gadmService';
 import { ZONE_METADATA } from '@/utils/zoneProvinces';
+import ParacelIslandsLabel from './ParacelIslandsLabel';
+import SpratlyIslandsLabel from './SpratlyIslandsLabel';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -393,6 +395,8 @@ const InteractiveMapContainer: React.FC = () => {
 
         <MapEventHandler />
         <MapControls />
+        <ParacelIslandsLabel />
+        <SpratlyIslandsLabel />
       </MapContainer>
 
       {/* Zone tooltip */}

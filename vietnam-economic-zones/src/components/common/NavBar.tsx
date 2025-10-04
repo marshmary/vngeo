@@ -40,6 +40,12 @@ const NavBar: React.FC = () => {
             >
               {language === 'vi' ? 'TÀI LIỆU' : 'DOCUMENTS'}
             </button>
+            <button
+              className={`nav-tab ${isActive('/quiz') ? 'active' : ''}`}
+              onClick={() => navigate('/quiz/1')}
+            >
+              {language === 'vi' ? 'KIỂM TRA' : 'QUIZ'}
+            </button>
           </nav>
 
           {/* Right Side - Language Toggle & Profile */}

@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
+import QuizPage from './pages/QuizPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoute from './components/auth/AdminRoute';
 import NavBar from './components/common/NavBar';
@@ -58,6 +59,14 @@ function AppContent() {
               <AdminRoute>
                 <AdminPage />
               </AdminRoute>
+            }
+          />
+          <Route
+            path="/quiz/:quizId"
+            element={
+              <ProtectedRoute>
+                <QuizPage />
+              </ProtectedRoute>
             }
           />
           {/* Future routes will be added here:
