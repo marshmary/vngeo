@@ -11,23 +11,44 @@ const DocumentsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  // Load documents from Supabase
+  // Load documents from Supabase (with StrictMode protection)
   useEffect(() => {
+    let cancelled = false;
+
     const loadDocuments = async () => {
+      console.log('[DocumentsPage] Starting document load...');
       try {
         setIsLoading(true);
         setError(null);
+        console.log('[DocumentsPage] Calling DocumentsPageService.getDocumentsByFolders()...');
         const foldersData = await DocumentsPageService.getDocumentsByFolders();
+
+        // Prevent state update if component unmounted
+        if (cancelled) {
+          console.log('[DocumentsPage] Component unmounted, skipping state update');
+          return;
+        }
+
+        console.log('[DocumentsPage] Documents loaded successfully:', foldersData);
         setFolders(foldersData);
       } catch (err) {
-        console.error('Error loading documents:', err);
+        if (cancelled) return;
+        console.error('[DocumentsPage] Error loading documents:', err);
         setError(err instanceof Error ? err.message : 'Failed to load documents');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          console.log('[DocumentsPage] Setting isLoading to false');
+          setIsLoading(false);
+        }
       }
     };
 
     loadDocuments();
+
+    // Cleanup function to cancel on unmount
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Get all documents or documents from selected folder

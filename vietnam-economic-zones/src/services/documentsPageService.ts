@@ -21,14 +21,51 @@ export interface DocumentFolder {
 
 export class DocumentsPageService {
   private static BUCKET_NAME = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'documents';
+  private static cache: { data: DocumentFolder[]; timestamp: number } | null = null;
+  private static CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private static pendingRequest: Promise<DocumentFolder[]> | null = null;
+
 
   /**
    * Get all documents organized by folders
    */
   static async getDocumentsByFolders(): Promise<DocumentFolder[]> {
+    console.log('[DocumentsPageService] Starting getDocumentsByFolders...');
+
+    // Check cache first
+    if (this.cache && Date.now() - this.cache.timestamp < this.CACHE_DURATION) {
+      console.log('[DocumentsPageService] Returning cached data');
+      return this.cache.data;
+    }
+
+    // If there's already a pending request, return that promise
+    if (this.pendingRequest) {
+      console.log('[DocumentsPageService] Reusing pending request');
+      return this.pendingRequest;
+    }
+
+    // Create new request
+    this.pendingRequest = this.fetchDocumentsFromStorage();
+
     try {
-      // First, list all top-level items (folders and files) in the bucket
-      const { data: topLevelItems, error: listError } = await supabase.storage
+      const result = await this.pendingRequest;
+      // Cache the result
+      this.cache = { data: result, timestamp: Date.now() };
+      return result;
+    } finally {
+      this.pendingRequest = null;
+    }
+  }
+
+  /**
+   * Internal method to fetch documents from storage
+   */
+  private static async fetchDocumentsFromStorage(): Promise<DocumentFolder[]> {
+    console.log('[DocumentsPageService] Fetching from storage...');
+    try {
+      // List all files recursively in one request (no need for connection check)
+      console.log('[DocumentsPageService] Listing all files from bucket:', this.BUCKET_NAME);
+      const listPromise = supabase.storage
         .from(this.BUCKET_NAME)
         .list('', {
           limit: 1000,
@@ -36,70 +73,108 @@ export class DocumentsPageService {
           sortBy: { column: 'name', order: 'asc' },
         });
 
+      // Create a timeout that will reject after 10 seconds
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout: Failed to fetch documents from storage')), 10000);
+      });
+
+      const { data: topLevelItems, error: listError } = await Promise.race([listPromise, timeoutPromise]);
+      console.log('[DocumentsPageService] Received response from storage.list:', { topLevelItems, listError });
+
       if (listError) {
         console.error('Error fetching top-level items:', listError);
+
+        // Provide more helpful error messages
+        if (listError.message?.includes('not found') || listError.message?.includes('does not exist')) {
+          throw new Error(`Storage bucket "${this.BUCKET_NAME}" does not exist. Please create it in Supabase dashboard.`);
+        }
+        if (listError.message?.includes('permission') || listError.message?.includes('authorized')) {
+          throw new Error(`No permission to access storage bucket "${this.BUCKET_NAME}". Please check storage policies.`);
+        }
+
         throw listError;
+      }
+
+      // Handle empty or null response
+      if (!topLevelItems) {
+        console.warn('No items found in storage bucket');
+        return [];
       }
 
       const folderMap = new Map<string, DocumentFile[]>();
 
-      // Process each item
+      // Identify folders first
+      const folderNames: string[] = [];
       for (const item of topLevelItems || []) {
-        // Check if this is a folder (no metadata.size indicates it's a folder)
         if (item.metadata?.size === undefined && item.id === null) {
-          // This is a folder, fetch documents from it
-          const folderName = item.name;
+          folderNames.push(item.name);
+        }
+      }
 
-          const { data: folderFiles, error: folderError } = await supabase.storage
+      // Batch fetch all folder contents in parallel
+      console.log('[DocumentsPageService] Found folders:', folderNames);
+      const folderPromises = folderNames.map(folderName =>
+        supabase.storage
+          .from(this.BUCKET_NAME)
+          .list(folderName, {
+            limit: 1000,
+            offset: 0,
+            sortBy: { column: 'name', order: 'asc' },
+          })
+          .then(result => ({ folderName, ...result }))
+      );
+
+      const folderResults = await Promise.all(folderPromises);
+      console.log('[DocumentsPageService] Fetched all folder contents');
+
+      // Process folder results
+      for (const { folderName, data: folderFiles, error: folderError } of folderResults) {
+        if (folderError) {
+          console.error(`Error fetching files from folder ${folderName}:`, folderError);
+          continue;
+        }
+
+        const documents: DocumentFile[] = [];
+
+        for (const file of folderFiles || []) {
+          // Skip nested folders
+          if (file.metadata?.size === undefined) continue;
+
+          // Skip .folderkeep files
+          if (file.name === '.folderkeep') continue;
+
+          const fullPath = `${folderName}/${file.name}`;
+
+          // Get public URL for download (this is a client-side operation, not a network request)
+          const { data: urlData } = supabase.storage
             .from(this.BUCKET_NAME)
-            .list(folderName, {
-              limit: 1000,
-              offset: 0,
-              sortBy: { column: 'name', order: 'asc' },
-            });
+            .getPublicUrl(fullPath);
 
-          if (folderError) {
-            console.error(`Error fetching files from folder ${folderName}:`, folderError);
-            continue;
-          }
+          // Get file extension
+          const fileExtension = file.name.split('.').pop()?.toUpperCase() || 'FILE';
 
-          const documents: DocumentFile[] = [];
+          documents.push({
+            id: file.id || fullPath,
+            name: file.name,
+            path: fullPath,
+            size: file.metadata?.size || 0,
+            created_at: file.created_at,
+            updated_at: file.updated_at,
+            mimetype: file.metadata?.mimetype || 'application/octet-stream',
+            folder: folderName,
+            downloadUrl: urlData.publicUrl,
+            fileExtension
+          });
+        }
 
-          for (const file of folderFiles || []) {
-            // Skip nested folders
-            if (file.metadata?.size === undefined) continue;
+        if (documents.length > 0) {
+          folderMap.set(folderName, documents);
+        }
+      }
 
-            // Skip .folderkeep files
-            if (file.name === '.folderkeep') continue;
-
-            const fullPath = `${folderName}/${file.name}`;
-
-            // Get public URL for download
-            const { data: urlData } = supabase.storage
-              .from(this.BUCKET_NAME)
-              .getPublicUrl(fullPath);
-
-            // Get file extension
-            const fileExtension = file.name.split('.').pop()?.toUpperCase() || 'FILE';
-
-            documents.push({
-              id: file.id || fullPath,
-              name: file.name,
-              path: fullPath,
-              size: file.metadata?.size || 0,
-              created_at: file.created_at,
-              updated_at: file.updated_at,
-              mimetype: file.metadata?.mimetype || 'application/octet-stream',
-              folder: folderName,
-              downloadUrl: urlData.publicUrl,
-              fileExtension
-            });
-          }
-
-          if (documents.length > 0) {
-            folderMap.set(folderName, documents);
-          }
-        } else if (item.metadata?.size !== undefined) {
+      // Process root-level files
+      for (const item of topLevelItems || []) {
+        if (item.metadata?.size !== undefined) {
           // This is a file in the root directory
           // Skip .folderkeep files
           if (item.name === '.folderkeep') continue;
@@ -138,9 +213,11 @@ export class DocumentsPageService {
       }));
 
       // Sort folders alphabetically
-      return folders.sort((a, b) => a.name.localeCompare(b.name));
+      const sortedFolders = folders.sort((a, b) => a.name.localeCompare(b.name));
+      console.log('[DocumentsPageService] Returning folders:', sortedFolders);
+      return sortedFolders;
     } catch (error) {
-      console.error('Error in getDocumentsByFolders:', error);
+      console.error('[DocumentsPageService] Error in getDocumentsByFolders:', error);
       throw error;
     }
   }

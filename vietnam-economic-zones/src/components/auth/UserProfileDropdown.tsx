@@ -2,14 +2,18 @@ import React, { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuthStore } from '@/stores/authStore';
+import { useMapStore } from '@/stores/mapStore';
 
 const UserProfileDropdown: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuthStore();
+  const { resetMapState } = useMapStore();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      // Reset map store to clear persisted data
+      resetMapState();
       navigate('/login');
     } catch (error) {
       console.error('Sign out error:', error);

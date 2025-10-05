@@ -6,6 +6,8 @@ import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
 import QuizPage from './pages/QuizPage';
+import QuizListPage from './pages/QuizListPage';
+import QuizEditPage from './pages/QuizEditPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminRoute from './components/auth/AdminRoute';
 import NavBar from './components/common/NavBar';
@@ -62,11 +64,27 @@ function AppContent() {
             }
           />
           <Route
+            path="/quizzes"
+            element={
+              <ProtectedRoute>
+                <QuizListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/quiz/:quizId"
             element={
               <ProtectedRoute>
                 <QuizPage />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/quiz/:quizId/edit"
+            element={
+              <AdminRoute>
+                <QuizEditPage />
+              </AdminRoute>
             }
           />
           {/* Future routes will be added here:

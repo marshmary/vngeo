@@ -1,42 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
-
-interface Quiz {
-  id: string;
-  title: string;
-  description: string;
-  questions: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  status: 'draft' | 'published' | 'archived';
-  createdAt: string;
-  updatedAt: string;
-}
+import { QuizService } from '@/services/quizService';
+import type { Quiz } from '@/types/quiz.types';
 
 const QuizManager: React.FC = () => {
   const navigate = useNavigate();
-  const [quizzes, setQuizzes] = useState<Quiz[]>([
-    {
-      id: '1',
-      title: 'Vietnam Economic Zones Basics',
-      description: 'Test your knowledge about Vietnam\'s economic zones and their characteristics.',
-      questions: 10,
-      difficulty: 'easy',
-      status: 'published',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-20'
-    },
-    {
-      id: '2',
-      title: 'Advanced Economic Zone Analysis',
-      description: 'Deep dive into economic zone data, GDP, and regional development.',
-      questions: 15,
-      difficulty: 'hard',
-      status: 'draft',
-      createdAt: '2024-01-18',
-      updatedAt: '2024-01-22'
-    }
-  ]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newQuiz, setNewQuiz] = useState({
@@ -48,27 +19,49 @@ const QuizManager: React.FC = () => {
   const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
   const [showCreateConfirmModal, setShowCreateConfirmModal] = useState(false);
 
+  // Load quizzes on mount
+  useEffect(() => {
+    loadQuizzes();
+  }, []);
+
+  const loadQuizzes = async () => {
+    try {
+      setIsLoading(true);
+      const loadedQuizzes = await QuizService.getAllQuizzes();
+      setQuizzes(loadedQuizzes);
+    } catch (error) {
+      console.error('Failed to load quizzes:', error);
+      alert('Failed to load quizzes. Please refresh the page.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCreateQuiz = () => {
     if (newQuiz.title && newQuiz.description) {
       setShowCreateConfirmModal(true);
     }
   };
 
-  const confirmCreateQuiz = () => {
-    const quiz: Quiz = {
-      id: Date.now().toString(),
-      title: newQuiz.title,
-      description: newQuiz.description,
-      questions: 0,
-      difficulty: newQuiz.difficulty,
-      status: 'draft',
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-    setQuizzes([...quizzes, quiz]);
-    setNewQuiz({ title: '', description: '', difficulty: 'easy' });
-    setShowCreateForm(false);
-    setShowCreateConfirmModal(false);
+  const confirmCreateQuiz = async () => {
+    try {
+      const quiz = await QuizService.createQuiz(
+        newQuiz.title,
+        newQuiz.description,
+        newQuiz.difficulty
+      );
+      setQuizzes([quiz, ...quizzes]);
+      setNewQuiz({ title: '', description: '', difficulty: 'easy' });
+      setShowCreateForm(false);
+      setShowCreateConfirmModal(false);
+
+      // Navigate to edit page
+      navigate(`/admin/quiz/${quiz.id}/edit`);
+    } catch (error) {
+      console.error('Failed to create quiz:', error);
+      alert('Failed to create quiz. Please try again.');
+      setShowCreateConfirmModal(false);
+    }
   };
 
   const cancelCreateQuiz = () => {
@@ -90,25 +83,24 @@ const QuizManager: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDeleteQuiz = () => {
+  const confirmDeleteQuiz = async () => {
     if (quizToDelete) {
-      setQuizzes(quizzes.filter(quiz => quiz.id !== quizToDelete.id));
-      setShowDeleteModal(false);
-      setQuizToDelete(null);
+      try {
+        await QuizService.deleteQuiz(quizToDelete.id);
+        setQuizzes(quizzes.filter(quiz => quiz.id !== quizToDelete.id));
+        setShowDeleteModal(false);
+        setQuizToDelete(null);
+      } catch (error) {
+        console.error('Failed to delete quiz:', error);
+        alert('Failed to delete quiz. Please try again.');
+        setShowDeleteModal(false);
+      }
     }
   };
 
   const cancelDeleteQuiz = () => {
     setShowDeleteModal(false);
     setQuizToDelete(null);
-  };
-
-  const handleStatusChange = (quizId: string, newStatus: 'draft' | 'published' | 'archived') => {
-    setQuizzes(quizzes.map(quiz => 
-      quiz.id === quizId 
-        ? { ...quiz, status: newStatus, updatedAt: new Date().toISOString().split('T')[0] }
-        : quiz
-    ));
   };
 
   const getStatusColor = (status: string) => {
@@ -208,8 +200,18 @@ const QuizManager: React.FC = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold">All Quizzes ({quizzes.length})</h3>
         </div>
-        <div className="divide-y divide-gray-200">
-          {quizzes.map((quiz) => (
+        {isLoading ? (
+          <div className="p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading quizzes...</p>
+          </div>
+        ) : quizzes.length === 0 ? (
+          <div className="p-12 text-center text-gray-500">
+            No quizzes yet. Click "Create Quiz" to get started.
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {quizzes.map((quiz) => (
             <div key={quiz.id} className="p-6 hover:bg-gray-50 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -224,9 +226,9 @@ const QuizManager: React.FC = () => {
                   </div>
                   <p className="text-gray-600 mb-2">{quiz.description}</p>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>{quiz.questions} questions</span>
-                    <span>Created: {quiz.createdAt}</span>
-                    <span>Updated: {quiz.updatedAt}</span>
+                    <span>{quiz.questions.length} questions</span>
+                    <span>Created: {new Date(quiz.createdAt).toLocaleDateString()}</span>
+                    <span>Updated: {new Date(quiz.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -237,15 +239,6 @@ const QuizManager: React.FC = () => {
                   >
                     Take Quiz
                   </button>
-                  <select
-                    value={quiz.status}
-                    onChange={(e) => handleStatusChange(quiz.id, e.target.value as 'draft' | 'published' | 'archived')}
-                    className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
                   <button
                     onClick={() => handleEditQuiz(quiz.id)}
                     className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
@@ -269,6 +262,7 @@ const QuizManager: React.FC = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}

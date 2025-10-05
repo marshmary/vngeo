@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import FileManager from '@/components/admin/FileManager';
 import QuizManager from '@/components/admin/QuizManager';
 
 const AdminPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'files' | 'users' | 'quiz'>('files');
+
+  // Initialize active tab from URL parameter
+  useEffect(() => {
+    const section = searchParams.get('section') as 'files' | 'users' | 'quiz' | null;
+    if (section && ['files', 'users', 'quiz'].includes(section)) {
+      setActiveTab(section);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: 'files' | 'users' | 'quiz') => {
+    setActiveTab(tab);
+    navigate(`/admin?section=${tab}`, { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -17,7 +33,7 @@ const AdminPage: React.FC = () => {
         {/* Tab Navigation */}
         <div className="bg-white rounded-2xl shadow-sm mb-6 p-2 inline-flex gap-2">
           <button
-            onClick={() => setActiveTab('files')}
+            onClick={() => handleTabChange('files')}
             className={`px-6 py-3 rounded-xl font-medium transition-all ${
               activeTab === 'files'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
@@ -42,7 +58,7 @@ const AdminPage: React.FC = () => {
             </div>
           </button>
           <button
-            onClick={() => setActiveTab('users')}
+            onClick={() => handleTabChange('users')}
             className={`px-6 py-3 rounded-xl font-medium transition-all ${
               activeTab === 'users'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
@@ -67,7 +83,7 @@ const AdminPage: React.FC = () => {
             </div>
           </button>
           <button
-            onClick={() => setActiveTab('quiz')}
+            onClick={() => handleTabChange('quiz')}
             className={`px-6 py-3 rounded-xl font-medium transition-all ${
               activeTab === 'quiz'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'

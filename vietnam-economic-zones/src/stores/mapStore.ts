@@ -66,6 +66,8 @@ export const useMapStore = create<MapState & MapActions>()(
         selectedZone: null,
         mapCenter: VIETNAM_MAP_CENTER,
         zoomLevel: DEFAULT_ZOOM_LEVEL,
+        zones: [],
+        isLoading: false,
         error: null
       }),
 
