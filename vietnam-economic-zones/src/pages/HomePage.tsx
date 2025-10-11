@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import InteractiveMapContainer from '@/components/map/InteractiveMapContainer';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import FirstTimeGuide from '@/components/guide/FirstTimeGuide';
 import { useMapStore } from '@/stores/mapStore';
 import { useUIStore } from '@/stores/uiStore';
 
 const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const {
     zones,
     selectedZone,
@@ -61,7 +64,10 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-20 left-0 right-0 bottom-0 overflow-hidden">
+    <div className="h-screen overflow-hidden">
+      {/* First Time Guide */}
+      <FirstTimeGuide />
+
       {/* Main Content */}
       <main className="h-full flex">
         {isLoading ? (
@@ -178,7 +184,7 @@ const HomePage: React.FC = () => {
                           key={industry}
                           className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium"
                         >
-                          {industry}
+                          {t(`industries.${industry}`)}
                         </span>
                       ))}
                     </div>

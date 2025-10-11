@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
 import { useMapStore } from '@/stores/mapStore';
 import ZoneLayer from './ZoneLayer';
 import ProvinceDebugger from '../debug/ProvinceDebugger';
@@ -34,6 +35,7 @@ const createZoneIcon = (color: string) => {
 };
 
 const VietnamMap: React.FC = () => {
+  const { t } = useTranslation();
   const {
     mapCenter,
     zoomLevel,
@@ -54,7 +56,7 @@ const VietnamMap: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-96 w-full rounded-lg bg-gray-100 flex items-center justify-center">
+      <div className="h-96 w-full bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading Vietnam map...</p>
@@ -65,7 +67,7 @@ const VietnamMap: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-96 w-full rounded-lg bg-red-50 border border-red-200 flex items-center justify-center">
+      <div className="h-96 w-full bg-red-50 border border-red-200 flex items-center justify-center">
         <div className="text-center text-red-600">
           <p className="font-semibold">Error loading map</p>
           <p className="text-sm">{error}</p>
@@ -81,7 +83,7 @@ const VietnamMap: React.FC = () => {
   }
 
   return (
-    <div className="h-96 w-full rounded-lg overflow-hidden shadow-lg border border-gray-200 relative">
+    <div className="h-96 w-full overflow-hidden shadow-lg border border-gray-200 relative">
       <ProvinceDebugger />
       <MapContainer
         center={mapCenter}
@@ -134,7 +136,7 @@ const VietnamMap: React.FC = () => {
                       key={industry}
                       className="px-2 py-1 bg-gray-100 text-xs rounded"
                     >
-                      {industry}
+                      {t(`industries.${industry}`)}
                     </span>
                   ))}
                 </div>

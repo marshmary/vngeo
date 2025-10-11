@@ -19,13 +19,13 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
+    fallbackLng: 'vi', // Default to Vietnamese
     debug: false,
 
     // Language detection options
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
-      lookupLocalStorage: 'vietnam-zones-language',
+      lookupLocalStorage: 'app-language', // Match uiStore key
       caches: ['localStorage'],
     },
 

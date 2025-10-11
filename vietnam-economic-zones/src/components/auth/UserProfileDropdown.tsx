@@ -1,13 +1,43 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightToBracket, faChevronDown, faGear, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { useMapStore } from '@/stores/mapStore';
+import { useUIStore } from '@/stores/uiStore';
 
-const UserProfileDropdown: React.FC = () => {
+interface UserProfileDropdownProps {
+  isCollapsed?: boolean;
+}
+
+const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed = false }) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuthStore();
   const { resetMapState } = useMapStore();
+  const { language } = useUIStore();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Calculate menu position when menu opens
+  const updateMenuPosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.top,
+        left: rect.left
+      });
+    }
+  };
+
+  // Update position when collapsed state changes
+  useEffect(() => {
+    if (isMenuOpen) {
+      updateMenuPosition();
+    }
+  }, [isCollapsed, isMenuOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -20,43 +50,69 @@ const UserProfileDropdown: React.FC = () => {
     }
   };
 
+  // If user is not logged in, show login button
+  if (!user) {
+    return (
+      <button
+        onClick={() => navigate('/login')}
+        className={`bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center ${
+          isCollapsed ? 'justify-center w-10 h-10' : 'gap-2 px-4 py-2 w-full'
+        }`}
+        title={language === 'vi' ? 'Đăng nhập' : 'Login'}
+      >
+        <FontAwesomeIcon icon={faRightToBracket} className="w-4 h-4" />
+        {!isCollapsed && (language === 'vi' ? 'Đăng nhập' : 'Login')}
+      </button>
+    );
+  }
+
   // Get user email or username
   const displayName = user?.user_metadata?.username || user?.email || 'User';
   const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg p-1">
-        {/* User Avatar */}
-        <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow">
-          {userInitial}
-        </div>
-        {/* Dropdown Icon */}
-        <svg
-          className="w-4 h-4 text-gray-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </Menu.Button>
+      {({ open }) => {
+        // Track menu open state and update position
+        if (open !== isMenuOpen) {
+          setIsMenuOpen(open);
+          if (open) {
+            requestAnimationFrame(updateMenuPosition);
+          }
+        }
 
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+        return (
+          <>
+            <Menu.Button
+              ref={buttonRef}
+              className={`flex items-center focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg p-1 ${isCollapsed ? 'justify-center' : 'space-x-2'}`}
+            >
+              {/* User Avatar */}
+              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow">
+                {userInitial}
+              </div>
+              {/* Dropdown Icon */}
+              {!isCollapsed && <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4 text-gray-600" />}
+            </Menu.Button>
+
+            {/* Render dropdown menu in a portal to escape sidebar container */}
+            {createPortal(
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items
+                  className="absolute w-56 origin-bottom-right bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-[6000]"
+                  style={{
+                    bottom: `${window.innerHeight - menuPosition.top}px`,
+                    left: `${menuPosition.left}px`
+                  }}
+                >
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
@@ -81,27 +137,12 @@ const UserProfileDropdown: React.FC = () => {
                       active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'
                     } group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors`}
                   >
-                    <svg
+                    <FontAwesomeIcon
+                      icon={faGear}
                       className={`${
                         active ? 'text-indigo-600' : 'text-gray-500'
                       } mr-3 h-5 w-5`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
+                    />
                     Admin Dashboard
                   </button>
                 )}
@@ -115,28 +156,24 @@ const UserProfileDropdown: React.FC = () => {
                     active ? 'bg-red-50 text-red-700' : 'text-gray-700'
                   } group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors`}
                 >
-                  <svg
+                  <FontAwesomeIcon
+                    icon={faRightFromBracket}
                     className={`${
                       active ? 'text-red-600' : 'text-gray-500'
                     } mr-3 h-5 w-5`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                    />
-                  </svg>
+                  />
                   Logout
                 </button>
               )}
             </Menu.Item>
           </div>
         </Menu.Items>
-      </Transition>
+      </Transition>,
+              document.body
+            )}
+          </>
+        );
+      }}
     </Menu>
   );
 };

@@ -1,5 +1,5 @@
 // Remove unused React import as JSX transform handles it
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import DocumentsPage from './pages/DocumentsPage';
@@ -8,17 +8,19 @@ import AdminPage from './pages/AdminPage';
 import QuizPage from './pages/QuizPage';
 import QuizListPage from './pages/QuizListPage';
 import QuizEditPage from './pages/QuizEditPage';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import MapDrawingPage from './pages/MapDrawingPage';
+import FeedbackPage from './pages/FeedbackPage';
 import AdminRoute from './components/auth/AdminRoute';
-import NavBar from './components/common/NavBar';
+import Sidebar from './components/common/Sidebar';
 import Notification from './components/common/Notification';
 import { initializeAuth } from './stores/authStore';
 import './index.css';
 
 function AppContent() {
   const location = useLocation();
-  const showNavBar = location.pathname !== '/login';
+  const showSidebar = location.pathname !== '/login';
   const isMapPage = location.pathname === '/';
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Prevent body scroll on map page
   useEffect(() => {
@@ -35,26 +37,17 @@ function AppContent() {
 
   return (
     <>
-      {showNavBar && <NavBar />}
-      <div className={`gradient-background ${showNavBar && !isMapPage ? 'pt-20' : ''} ${isMapPage ? 'h-screen overflow-hidden' : ''}`}>
+      {showSidebar && <Sidebar onCollapsedChange={setSidebarCollapsed} />}
+      <div
+        className={`gradient-background transition-all duration-300 ${isMapPage ? 'h-screen overflow-hidden' : 'min-h-screen'}`}
+        style={{
+          marginLeft: showSidebar && window.innerWidth >= 1024 ? (sidebarCollapsed ? '5rem' : '18rem') : '0',
+        }}
+      >
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/documents"
-            element={
-              <ProtectedRoute>
-                <DocumentsPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/documents" element={<DocumentsPage />} />
           <Route
             path="/admin"
             element={
@@ -63,22 +56,10 @@ function AppContent() {
               </AdminRoute>
             }
           />
-          <Route
-            path="/quizzes"
-            element={
-              <ProtectedRoute>
-                <QuizListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quiz/:quizId"
-            element={
-              <ProtectedRoute>
-                <QuizPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/quizzes" element={<QuizListPage />} />
+          <Route path="/quiz/:quizId" element={<QuizPage />} />
+          <Route path="/map-drawing" element={<MapDrawingPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
           <Route
             path="/admin/quiz/:quizId/edit"
             element={

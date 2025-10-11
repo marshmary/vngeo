@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
 import { useMapStore } from '@/stores/mapStore';
 import { useUIStore } from '@/stores/uiStore';
 import { gadmService, type ZoneGeoJSON } from '@/services/gadmService';
@@ -64,7 +65,7 @@ const MapControls: React.FC = () => {
   };
 
   return (
-    <div className="absolute top-4 left-4 z-[1000] flex flex-col space-y-2">
+    <div data-guide="map-controls" className="absolute top-4 left-4 z-[1000] flex flex-col space-y-2">
       <button
         onClick={handleZoomIn}
         className="bg-white hover:bg-gray-50 border border-gray-300 rounded px-3 py-2 shadow-md focus-ring"
@@ -132,6 +133,7 @@ const ZoneTooltip: React.FC<ZoneTooltipProps> = ({ zone, mousePosition }) => {
 };
 
 const InteractiveMapContainer: React.FC = () => {
+  const { t } = useTranslation();
   const {
     mapCenter,
     zoomLevel,
@@ -151,6 +153,7 @@ const InteractiveMapContainer: React.FC = () => {
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [isLoadingBoundaries, setIsLoadingBoundaries] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<Record<string, L.Layer>>({});
 
   // Load zones and GADM-based boundary data
   useEffect(() => {
@@ -207,6 +210,9 @@ const InteractiveMapContainer: React.FC = () => {
     const zone = getZoneById(zoneId);
 
     if (!zoneMetadata) return;
+
+    // Store layer reference for legend click access
+    layersRef.current[zoneId] = layer;
 
     layer.on({
       mouseover: (e) => {
@@ -267,6 +273,11 @@ const InteractiveMapContainer: React.FC = () => {
       ? ` + ${provinces.length - 5} more`
       : '';
 
+    // Translate industries
+    const translatedIndustries = zone ? zone.industries.slice(0, 3).map((industry: string) =>
+      t(`industries.${industry}`)
+    ) : [];
+
     const popupContent = `
       <div class="p-3 min-w-[250px]">
         <h3 class="font-semibold text-lg text-gray-800 mb-1">
@@ -282,7 +293,7 @@ const InteractiveMapContainer: React.FC = () => {
             <p><strong>Area:</strong> ${zone.area.toLocaleString()} km²</p>
           </div>
           <div class="mt-2 flex flex-wrap gap-1">
-            ${zone.industries.slice(0, 3).map((industry: string) =>
+            ${translatedIndustries.map((industry: string) =>
               `<span class="px-2 py-1 bg-gray-100 text-xs rounded">${industry}</span>`
             ).join('')}
           </div>
@@ -325,9 +336,35 @@ const InteractiveMapContainer: React.FC = () => {
     };
   };
 
+  // Handle legend click to focus on zone with animation
+  const handleLegendClick = (zoneId: string) => {
+    setSelectedZone(zoneId);
+
+    const layer = layersRef.current[zoneId];
+    const zoneMetadata = ZONE_METADATA[zoneId as keyof typeof ZONE_METADATA];
+
+    if (layer && 'getBounds' in layer && typeof layer.getBounds === 'function') {
+      mapRef.current?.fitBounds(layer.getBounds(), {
+        padding: [20, 20],
+        maxZoom: 10,
+        animate: true,
+        duration: 0.8
+      });
+    }
+
+    if (zoneMetadata) {
+      showNotification(
+        language === 'vi'
+          ? `Đã chọn ${zoneMetadata.nameVi}`
+          : `Selected ${zoneMetadata.name}`,
+        'info'
+      );
+    }
+  };
+
   if (isLoading || isLoadingBoundaries) {
     return (
-      <div className="h-96 w-full rounded-lg bg-gray-100 flex items-center justify-center">
+      <div className="h-96 w-full bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">
@@ -345,7 +382,7 @@ const InteractiveMapContainer: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-96 w-full rounded-lg bg-red-50 border border-red-200 flex items-center justify-center">
+      <div className="h-96 w-full bg-red-50 border border-red-200 flex items-center justify-center">
         <div className="text-center text-red-600">
           <p className="font-semibold">
             {language === 'vi' ? 'Lỗi tải bản đồ' : 'Error loading map'}
@@ -363,7 +400,7 @@ const InteractiveMapContainer: React.FC = () => {
   }
 
   return (
-    <div className="relative h-full w-full rounded-2xl overflow-hidden">
+    <div data-guide="map-container" className="relative h-full w-full overflow-hidden">
       <MapContainer
         center={mapCenter}
         zoom={zoomLevel}
@@ -403,7 +440,7 @@ const InteractiveMapContainer: React.FC = () => {
       <ZoneTooltip zone={hoveredZone} mousePosition={mousePosition} />
 
       {/* Economic Zone Legend */}
-      <div className="legend-container">
+      <div data-guide="map-legend" className="legend-container">
         <div className="mb-3">
           <h4 className="font-semibold text-sm text-gray-900">
             {language === 'vi' ? 'VÙNG KINH TẾ' : 'ECONOMIC ZONES'}
@@ -414,7 +451,7 @@ const InteractiveMapContainer: React.FC = () => {
           {Object.entries(ZONE_METADATA).map(([zoneId, metadata]) => (
             <button
               key={zoneId}
-              onClick={() => setSelectedZone(zoneId)}
+              onClick={() => handleLegendClick(zoneId)}
               className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200 hover:bg-gray-50 ${
                 selectedZone === zoneId ? 'bg-blue-50 border border-blue-200' : ''
               }`}
@@ -431,34 +468,6 @@ const InteractiveMapContainer: React.FC = () => {
         </div>
       </div>
 
-      {/* Instructions overlay */}
-      {!selectedZone && (
-        <div className="absolute top-4 right-4 bg-blue-500 bg-opacity-90 text-white px-3 py-2 rounded-lg text-sm max-w-xs">
-          <p className="font-medium">
-            {language === 'vi' ? '💡 Mẹo sử dụng:' : '💡 How to use:'}
-          </p>
-          <ul className="mt-1 space-y-1 text-xs">
-            <li>
-              {language === 'vi'
-                ? '• Di chuột để xem thông tin'
-                : '• Hover to see zone info'
-              }
-            </li>
-            <li>
-              {language === 'vi'
-                ? '• Nhấp để chọn vùng'
-                : '• Click to select zone'
-              }
-            </li>
-            <li>
-              {language === 'vi'
-                ? '• Cuộn để phong to/thu nhỏ'
-                : '• Scroll to zoom in/out'
-              }
-            </li>
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

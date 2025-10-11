@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMap, faFileAlt, faPencilRuler, faClipboardQuestion, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import UserProfileDropdown from '@/components/auth/UserProfileDropdown';
 import { useUIStore } from '@/stores/uiStore';
 import { QuizService } from '@/services/quizService';
@@ -79,24 +81,34 @@ const NavBar: React.FC = () => {
           {/* Navigation Tabs */}
           <nav className="flex space-x-1">
             <button
-              className={`nav-tab ${isActive('/') ? 'active' : ''}`}
+              className={`nav-tab ${isActive('/') ? 'active' : ''} flex items-center gap-2`}
               onClick={() => navigate('/')}
             >
+              <FontAwesomeIcon icon={faMap} className="w-4 h-4" />
               {language === 'vi' ? 'BẢN ĐỒ' : 'MAP'}
             </button>
             <button
-              className={`nav-tab ${isActive('/documents') ? 'active' : ''}`}
+              className={`nav-tab ${isActive('/documents') ? 'active' : ''} flex items-center gap-2`}
               onClick={() => navigate('/documents')}
             >
+              <FontAwesomeIcon icon={faFileAlt} className="w-4 h-4" />
               {language === 'vi' ? 'TÀI LIỆU' : 'DOCUMENTS'}
+            </button>
+            <button
+              className={`nav-tab ${isActive('/map-drawing') ? 'active' : ''} flex items-center gap-2`}
+              onClick={() => navigate('/map-drawing')}
+            >
+              <FontAwesomeIcon icon={faPencilRuler} className="w-4 h-4" />
+              {language === 'vi' ? 'VẼ BẢN ĐỒ' : 'MAP DRAWING'}
             </button>
 
             {/* Quiz Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
-                className={`nav-tab ${location.pathname.startsWith('/quiz') ? 'active' : ''} flex items-center gap-1`}
+                className={`nav-tab ${location.pathname.startsWith('/quiz') ? 'active' : ''} flex items-center gap-2`}
                 onClick={() => setShowQuizDropdown(!showQuizDropdown)}
               >
+                <FontAwesomeIcon icon={faClipboardQuestion} className="w-4 h-4" />
                 {language === 'vi' ? 'KIỂM TRA' : 'QUIZ'}
                 <svg
                   className={`w-4 h-4 transition-transform ${showQuizDropdown ? 'rotate-180' : ''}`}
@@ -182,22 +194,24 @@ const NavBar: React.FC = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => useUIStore.getState().setLanguage('vi')}
-                className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors flex items-center gap-1.5 ${
                   language === 'vi'
                     ? 'bg-indigo-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
+                <FontAwesomeIcon icon={faGlobe} className="w-3.5 h-3.5" />
                 VI
               </button>
               <button
                 onClick={() => useUIStore.getState().setLanguage('en')}
-                className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1 text-sm rounded-lg font-medium transition-colors flex items-center gap-1.5 ${
                   language === 'en'
                     ? 'bg-indigo-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
+                <FontAwesomeIcon icon={faGlobe} className="w-3.5 h-3.5" />
                 EN
               </button>
             </div>

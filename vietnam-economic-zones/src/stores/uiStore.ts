@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import i18n from '@/i18n';
 
 interface UIState {
   // Modal states
@@ -52,18 +54,29 @@ interface UIActions {
   closeMobileMenu: () => void;
 }
 
-export const useUIStore = create<UIState & UIActions>()((set, get) => ({
-  // State
-  isDocumentModalOpen: false,
-  isQAModalOpen: false,
-  isAdminModalOpen: false,
-  isGlobalLoading: false,
-  loadingMessage: '',
-  notification: null,
-  isDarkMode: false,
-  isHighContrast: false,
-  language: 'vi',
-  isMobileMenuOpen: false,
+// Get initial language from localStorage or default to Vietnamese
+const getInitialLanguage = (): 'vi' | 'en' => {
+  const stored = localStorage.getItem('app-language');
+  if (stored === 'vi' || stored === 'en') {
+    return stored;
+  }
+  return 'vi'; // Default to Vietnamese
+};
+
+export const useUIStore = create<UIState & UIActions>()(
+  persist(
+    (set, get) => ({
+      // State
+      isDocumentModalOpen: false,
+      isQAModalOpen: false,
+      isAdminModalOpen: false,
+      isGlobalLoading: false,
+      loadingMessage: '',
+      notification: null,
+      isDarkMode: false,
+      isHighContrast: false,
+      language: getInitialLanguage(),
+      isMobileMenuOpen: false,
 
   // Actions
   openDocumentModal: () => set({ isDocumentModalOpen: true }),
@@ -107,11 +120,35 @@ export const useUIStore = create<UIState & UIActions>()((set, get) => ({
     isHighContrast: !state.isHighContrast
   })),
 
-  setLanguage: (language) => set({ language }),
+      setLanguage: (language) => {
+        // Sync with i18n
+        i18n.changeLanguage(language);
+        // Save to localStorage
+        localStorage.setItem('app-language', language);
+        set({ language });
+      },
 
-  toggleMobileMenu: () => set((state) => ({
-    isMobileMenuOpen: !state.isMobileMenuOpen
-  })),
+      toggleMobileMenu: () => set((state) => ({
+        isMobileMenuOpen: !state.isMobileMenuOpen
+      })),
 
-  closeMobileMenu: () => set({ isMobileMenuOpen: false })
-}));
+      closeMobileMenu: () => set({ isMobileMenuOpen: false })
+    }),
+    {
+      name: 'ui-storage',
+      partialize: (state) => ({
+        language: state.language,
+        isDarkMode: state.isDarkMode,
+        isHighContrast: state.isHighContrast
+      }),
+    }
+  )
+);
+
+// Listen to i18n language changes and sync with store
+i18n.on('languageChanged', (lng) => {
+  const language = lng.startsWith('vi') ? 'vi' : 'en';
+  if (useUIStore.getState().language !== language) {
+    useUIStore.setState({ language });
+  }
+});

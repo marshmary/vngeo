@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useMapStore } from '@/stores/mapStore';
 import type { EconomicZone } from '@/types/zone.types';
 
@@ -9,6 +10,7 @@ interface ZoneCardProps {
 }
 
 const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
+  const { t } = useTranslation();
   const { selectedZone, setSelectedZone } = useMapStore();
   const isSelected = selectedZone === zone.id;
 
@@ -80,7 +82,7 @@ const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
               key={industry}
               className="px-2 py-1 bg-gray-100 text-xs rounded text-gray-700"
             >
-              {industry}
+              {t(`industries.${industry}`)}
             </span>
           ))}
           {zone.industries.length > 2 && (

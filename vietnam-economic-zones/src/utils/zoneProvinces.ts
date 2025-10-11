@@ -26,7 +26,8 @@ export const ZONE_PROVINCES: Record<string, string[]> = {
     'HưngYên',
     'NamĐịnh',
     'TháiBình',
-    'VĩnhPhúc'
+    'VĩnhPhúc',
+    'QuảngNinh'
   ],
   'zone-3': [
     'ThanhHóa',
