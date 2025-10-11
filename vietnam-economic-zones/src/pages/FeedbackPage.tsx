@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/uiStore';
 import { SettingsService } from '@/services/settingsService';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const FeedbackPage: React.FC = () => {
-  const { t } = useTranslation();
   const { language } = useUIStore();
   const [feedbackUrl, setFeedbackUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
