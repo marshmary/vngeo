@@ -20,8 +20,9 @@ const DocumentsPage: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        console.log('[DocumentsPage] Calling DocumentsPageService.getDocumentsByFolders()...');
-        const foldersData = await DocumentsPageService.getDocumentsByFolders();
+        console.log('[DocumentsPage] Calling DocumentsPageService.getDocumentsByFolders() with forceRefresh=true...');
+        // Force refresh on mount to ensure we always fetch fresh data when navigating to the page
+        const foldersData = await DocumentsPageService.getDocumentsByFolders(true);
 
         // Prevent state update if component unmounted
         if (cancelled) {
@@ -94,7 +95,7 @@ const DocumentsPage: React.FC = () => {
                 onClick={() => {
                   setIsLoading(true);
                   setError(null);
-                  DocumentsPageService.getDocumentsByFolders()
+                  DocumentsPageService.getDocumentsByFolders(true)
                     .then(setFolders)
                     .catch(err => {
                       console.error('Error refreshing documents:', err);

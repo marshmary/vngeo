@@ -28,14 +28,21 @@ export class DocumentsPageService {
 
   /**
    * Get all documents organized by folders
+   * @param forceRefresh - If true, bypass cache and fetch fresh data
    */
-  static async getDocumentsByFolders(): Promise<DocumentFolder[]> {
-    console.log('[DocumentsPageService] Starting getDocumentsByFolders...');
+  static async getDocumentsByFolders(forceRefresh: boolean = false): Promise<DocumentFolder[]> {
+    console.log('[DocumentsPageService] Starting getDocumentsByFolders...', { forceRefresh });
 
-    // Check cache first
-    if (this.cache && Date.now() - this.cache.timestamp < this.CACHE_DURATION) {
+    // Check cache first (unless force refresh is requested)
+    if (!forceRefresh && this.cache && Date.now() - this.cache.timestamp < this.CACHE_DURATION) {
       console.log('[DocumentsPageService] Returning cached data');
       return this.cache.data;
+    }
+
+    // If cache is stale or force refresh, invalidate it
+    if (forceRefresh) {
+      console.log('[DocumentsPageService] Force refresh requested, invalidating cache');
+      this.cache = null;
     }
 
     // If there's already a pending request, return that promise

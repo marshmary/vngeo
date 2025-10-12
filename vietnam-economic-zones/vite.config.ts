@@ -10,4 +10,19 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        // Remove console.log, console.info, console.debug in production
+        // Keep console.error, console.warn for debugging production issues
+        drop_console: false,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+    },
+  },
+  esbuild: {
+    // Remove debugger statements in development and production
+    drop: ['debugger'],
+  },
 })
