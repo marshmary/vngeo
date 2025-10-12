@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { QuizService } from '@/services/quizService';
 import type { Quiz } from '@/types/quiz.types';
-import { useUIStore } from '@/stores/uiStore';
 
 const QuizListPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { language } = useUIStore();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
@@ -60,19 +60,17 @@ const QuizListPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {language === 'vi' ? 'Bài Kiểm Tra' : 'Quizzes'}
+            {t('quizList.title')}
           </h1>
           <p className="text-lg text-gray-600">
-            {language === 'vi'
-              ? 'Kiểm tra kiến thức của bạn về các vùng kinh tế Việt Nam'
-              : 'Test your knowledge about Vietnam Economic Zones'}
+            {t('quizList.subtitle')}
           </p>
         </div>
 
         {/* Filters */}
         <div className="mb-6 flex items-center gap-3">
           <span className="text-sm font-medium text-gray-700">
-            {language === 'vi' ? 'Độ khó:' : 'Difficulty:'}
+            {t('quizList.difficulty')}
           </span>
           <div className="flex gap-2">
             {['all', 'easy', 'medium', 'hard'].map((diff) => (
@@ -85,9 +83,7 @@ const QuizListPage: React.FC = () => {
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                {diff === 'all'
-                  ? (language === 'vi' ? 'Tất cả' : 'All')
-                  : diff.charAt(0).toUpperCase() + diff.slice(1)}
+                {t(`quizList.${diff}`)}
               </button>
             ))}
           </div>
@@ -97,7 +93,7 @@ const QuizListPage: React.FC = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-            <p className="text-gray-600">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</p>
+            <p className="text-gray-600">{t('quizList.loading')}</p>
           </div>
         ) : filteredQuizzes.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
@@ -105,7 +101,7 @@ const QuizListPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <p className="text-gray-500 text-lg">
-              {language === 'vi' ? 'Không có bài kiểm tra nào' : 'No quizzes available'}
+              {t('quizList.noQuizzes')}
             </p>
           </div>
         ) : (
@@ -121,11 +117,11 @@ const QuizListPage: React.FC = () => {
                   <div className="h-32 bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex items-end">
                     <div className="flex items-center gap-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(quiz.difficulty)}`}>
-                        {quiz.difficulty}
+                        {t(`quizList.${quiz.difficulty}`)}
                       </span>
                       {quiz.timeLimit && (
                         <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm">
-                          {quiz.timeLimit} {language === 'vi' ? 'phút' : 'min'}
+                          {quiz.timeLimit} {t('quizList.minutes')}
                         </span>
                       )}
                     </div>
@@ -143,7 +139,7 @@ const QuizListPage: React.FC = () => {
                     {/* Stats */}
                     <div className="flex items-center justify-end pt-4 border-t border-gray-100">
                       <button className="text-indigo-600 font-medium text-sm group-hover:text-indigo-700 flex items-center gap-1">
-                        {language === 'vi' ? 'Bắt đầu' : 'Start'}
+                        {t('quizList.start')}
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -162,7 +158,7 @@ const QuizListPage: React.FC = () => {
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  aria-label={language === 'vi' ? 'Trang trước' : 'Previous page'}
+                  aria-label={t('quizList.previousPage')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -213,7 +209,7 @@ const QuizListPage: React.FC = () => {
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  aria-label={language === 'vi' ? 'Trang tiếp theo' : 'Next page'}
+                  aria-label={t('quizList.nextPage')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

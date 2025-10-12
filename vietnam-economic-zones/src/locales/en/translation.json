@@ -128,6 +128,66 @@
       "tip1": "To embed a YouTube video, use format: https://www.youtube.com/embed/VIDEO_ID",
       "tip2": "Find VIDEO_ID from original YouTube URL (part after \"v=\" or \"youtu.be/\")",
       "tip3": "This video will be displayed on the \"Map Drawing\" page"
+    },
+    "quiz": {
+      "title": "Quiz Management",
+      "description": "Create and manage quizzes for Vietnam Economic Zones",
+      "createQuiz": "Create Quiz",
+      "createNewQuiz": "Create New Quiz",
+      "quizTitle": "Quiz Title",
+      "enterQuizTitle": "Enter quiz title",
+      "description": "Description",
+      "enterQuizDescription": "Enter quiz description",
+      "difficulty": "Difficulty",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "cancel": "Cancel",
+      "allQuizzes": "All Quizzes",
+      "loadingQuizzes": "Loading quizzes...",
+      "noQuizzes": "No quizzes yet. Click \"Create Quiz\" to get started.",
+      "questions": "questions",
+      "created": "Created",
+      "updated": "Updated",
+      "takeQuiz": "Take Quiz",
+      "editQuiz": "Edit Quiz",
+      "deleteQuiz": "Delete Quiz",
+      "deleteConfirmTitle": "Delete Quiz",
+      "deleteConfirmMessage": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+      "delete": "Delete",
+      "createConfirmTitle": "Create Quiz",
+      "createConfirmMessage": "Are you sure you want to create the quiz \"{{title}}\"?",
+      "create": "Create",
+      "status": {
+        "published": "Published",
+        "draft": "Draft",
+        "archived": "Archived"
+      },
+      "statusDescriptions": {
+        "published": "Visible to all users - students can take this quiz",
+        "draft": "Not visible to users - only accessible in edit mode",
+        "archived": "Hidden from users - can be restored later"
+      },
+      "errors": {
+        "loadFailed": "Failed to load quizzes. Please refresh the page.",
+        "createFailed": "Failed to create quiz. Please try again.",
+        "deleteFailed": "Failed to delete quiz. Please try again."
+      }
     }
+  },
+  "quizList": {
+    "title": "Quizzes",
+    "subtitle": "Test your knowledge about Vietnam Economic Zones",
+    "difficulty": "Difficulty:",
+    "all": "All",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "loading": "Loading...",
+    "noQuizzes": "No quizzes available",
+    "minutes": "min",
+    "start": "Start",
+    "previousPage": "Previous page",
+    "nextPage": "Next page"
   }
 }

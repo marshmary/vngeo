@@ -201,7 +201,7 @@ const NavBar: React.FC = () => {
                 }`}
               >
                 <FontAwesomeIcon icon={faGlobe} className="w-3.5 h-3.5" />
-                VI
+                <span className="w-5 text-center">VN</span>
               </button>
               <button
                 onClick={() => useUIStore.getState().setLanguage('en')}
@@ -212,7 +212,7 @@ const NavBar: React.FC = () => {
                 }`}
               >
                 <FontAwesomeIcon icon={faGlobe} className="w-3.5 h-3.5" />
-                EN
+                <span className="w-5 text-center">EN</span>
               </button>
             </div>
 

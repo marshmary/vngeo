@@ -128,6 +128,66 @@
       "tip1": "Để nhúng video YouTube, sử dụng định dạng: https://www.youtube.com/embed/VIDEO_ID",
       "tip2": "Tìm VIDEO_ID từ URL YouTube gốc (phần sau \"v=\" hoặc \"youtu.be/\")",
       "tip3": "Video này sẽ được hiển thị trên trang \"Vẽ Bản Đồ\""
+    },
+    "quiz": {
+      "title": "Quản Lý Bài Kiểm Tra",
+      "description": "Tạo và quản lý bài kiểm tra cho Vùng Kinh Tế Việt Nam",
+      "createQuiz": "Tạo Bài Kiểm Tra",
+      "createNewQuiz": "Tạo Bài Kiểm Tra Mới",
+      "quizTitle": "Tiêu Đề Bài Kiểm Tra",
+      "enterQuizTitle": "Nhập tiêu đề bài kiểm tra",
+      "description": "Mô Tả",
+      "enterQuizDescription": "Nhập mô tả bài kiểm tra",
+      "difficulty": "Độ Khó",
+      "easy": "Dễ",
+      "medium": "Trung Bình",
+      "hard": "Khó",
+      "cancel": "Hủy",
+      "allQuizzes": "Tất Cả Bài Kiểm Tra",
+      "loadingQuizzes": "Đang tải bài kiểm tra...",
+      "noQuizzes": "Chưa có bài kiểm tra nào. Nhấp \"Tạo Bài Kiểm Tra\" để bắt đầu.",
+      "questions": "câu hỏi",
+      "created": "Đã tạo",
+      "updated": "Đã cập nhật",
+      "takeQuiz": "Làm Bài Kiểm Tra",
+      "editQuiz": "Chỉnh Sửa Bài Kiểm Tra",
+      "deleteQuiz": "Xóa Bài Kiểm Tra",
+      "deleteConfirmTitle": "Xóa Bài Kiểm Tra",
+      "deleteConfirmMessage": "Bạn có chắc chắn muốn xóa \"{{title}}\"? Hành động này không thể hoàn tác.",
+      "delete": "Xóa",
+      "createConfirmTitle": "Tạo Bài Kiểm Tra",
+      "createConfirmMessage": "Bạn có chắc chắn muốn tạo bài kiểm tra \"{{title}}\"?",
+      "create": "Tạo",
+      "status": {
+        "published": "Đã xuất bản",
+        "draft": "Nháp",
+        "archived": "Đã lưu trữ"
+      },
+      "statusDescriptions": {
+        "published": "Hiển thị cho tất cả người dùng - học sinh có thể làm bài kiểm tra này",
+        "draft": "Không hiển thị cho người dùng - chỉ có thể truy cập ở chế độ chỉnh sửa",
+        "archived": "Ẩn khỏi người dùng - có thể khôi phục sau"
+      },
+      "errors": {
+        "loadFailed": "Không thể tải bài kiểm tra. Vui lòng làm mới trang.",
+        "createFailed": "Không thể tạo bài kiểm tra. Vui lòng thử lại.",
+        "deleteFailed": "Không thể xóa bài kiểm tra. Vui lòng thử lại."
+      }
     }
+  },
+  "quizList": {
+    "title": "Bài Kiểm Tra",
+    "subtitle": "Kiểm tra kiến thức của bạn về các vùng kinh tế Việt Nam",
+    "difficulty": "Độ khó:",
+    "all": "Tất cả",
+    "easy": "Dễ",
+    "medium": "Trung Bình",
+    "hard": "Khó",
+    "loading": "Đang tải...",
+    "noQuizzes": "Không có bài kiểm tra nào",
+    "minutes": "phút",
+    "start": "Bắt đầu",
+    "previousPage": "Trang trước",
+    "nextPage": "Trang tiếp theo"
   }
 }
