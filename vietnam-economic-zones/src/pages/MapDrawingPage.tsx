@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SettingsService } from '@/services/settingsService';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -9,11 +9,7 @@ const MapDrawingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadVideoUrl();
-  }, []);
-
-  const loadVideoUrl = async () => {
+  const loadVideoUrl = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -30,7 +26,11 @@ const MapDrawingPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    loadVideoUrl();
+  }, [loadVideoUrl]);
 
   if (isLoading) {
     return (

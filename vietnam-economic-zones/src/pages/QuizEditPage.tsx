@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUIStore } from '@/stores/uiStore';
 import { QuizService, QuizDraftService } from '@/services/quizService';
@@ -30,11 +30,7 @@ const QuizEditPage: React.FC = () => {
   const [currentExplanation, setCurrentExplanation] = useState('');
   const [allowMultipleAnswers, setAllowMultipleAnswers] = useState(false);
 
-  useEffect(() => {
-    loadQuiz();
-  }, [quizId]);
-
-  const loadQuiz = async () => {
+  const loadQuiz = useCallback(async () => {
     if (!quizId) return;
 
     setIsLoading(true);
@@ -60,7 +56,11 @@ const QuizEditPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [quizId]);
+
+  useEffect(() => {
+    loadQuiz();
+  }, [loadQuiz]);
 
   const loadDraft = () => {
     if (!quizId) return;

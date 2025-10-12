@@ -10,7 +10,7 @@ export interface StorageFile {
   metadata?: {
     size?: number;
     mimetype?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -128,7 +128,7 @@ export class DocumentService {
     // Delete the folder placeholder
     try {
       await this.deleteFile(`${folderPath}/.folderkeep`);
-    } catch (error) {
+    } catch {
       // Folder might not have a placeholder
       console.warn('No folder placeholder found');
     }
@@ -171,7 +171,7 @@ export class DocumentService {
   /**
    * Get file metadata
    */
-  static async getFileMetadata(filePath: string): Promise<any> {
+  static async getFileMetadata(filePath: string): Promise<StorageFile | undefined> {
     const { data, error } = await supabase.storage
       .from(this.BUCKET_NAME)
       .list(filePath.split('/').slice(0, -1).join('/'), {

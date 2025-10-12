@@ -343,4 +343,3 @@ const FirstTimeGuide: React.FC = () => {
 };
 
 export default FirstTimeGuide;
-export { GUIDE_STORAGE_KEY };

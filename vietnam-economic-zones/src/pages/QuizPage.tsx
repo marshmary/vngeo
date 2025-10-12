@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QuizService } from '@/services/quizService';
 import type { Quiz } from '@/types/quiz.types';
@@ -20,13 +20,7 @@ const QuizPage: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    if (quizId) {
-      loadQuiz();
-    }
-  }, [quizId]);
-
-  const loadQuiz = async () => {
+  const loadQuiz = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -52,7 +46,7 @@ const QuizPage: React.FC = () => {
       if (loadedQuiz.timeLimit) {
         setTimeLeft(loadedQuiz.timeLimit * 60); // Convert minutes to seconds
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to load quiz:', err);
       setError(language === 'vi'
         ? 'Không thể tải bài kiểm tra'
@@ -60,7 +54,35 @@ const QuizPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [quizId, user?.role, language]);
+
+  useEffect(() => {
+    if (quizId) {
+      loadQuiz();
+    }
+  }, [quizId, loadQuiz]);
+
+  const handleSubmitQuiz = useCallback(() => {
+    if (!quiz) return;
+
+    let correctAnswers = 0;
+    quiz.questions.forEach((question) => {
+      const userAnswers = selectedAnswers[question.id] || [];
+      const correctOptions = question.options.filter(opt => opt.isCorrect).map(opt => opt.id);
+
+      // Check if arrays match (same length and same elements)
+      const isCorrect =
+        userAnswers.length === correctOptions.length &&
+        userAnswers.every(ans => correctOptions.includes(ans));
+
+      if (isCorrect) {
+        correctAnswers++;
+      }
+    });
+
+    setScore(correctAnswers);
+    setShowResults(true);
+  }, [quiz, selectedAnswers]);
 
   useEffect(() => {
     if (timeLeft !== null && timeLeft > 0) {
@@ -69,7 +91,7 @@ const QuizPage: React.FC = () => {
     } else if (timeLeft === 0) {
       handleSubmitQuiz();
     }
-  }, [timeLeft]);
+  }, [timeLeft, handleSubmitQuiz]);
 
   const handleAnswerSelect = (optionId: string) => {
     if (!quiz) return;
@@ -98,28 +120,6 @@ const QuizPage: React.FC = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
-  };
-
-  const handleSubmitQuiz = () => {
-    if (!quiz) return;
-
-    let correctAnswers = 0;
-    quiz.questions.forEach((question) => {
-      const userAnswers = selectedAnswers[question.id] || [];
-      const correctOptions = question.options.filter(opt => opt.isCorrect).map(opt => opt.id);
-
-      // Check if arrays match (same length and same elements)
-      const isCorrect =
-        userAnswers.length === correctOptions.length &&
-        userAnswers.every(ans => correctOptions.includes(ans));
-
-      if (isCorrect) {
-        correctAnswers++;
-      }
-    });
-
-    setScore(correctAnswers);
-    setShowResults(true);
   };
 
   const formatTime = (seconds: number) => {

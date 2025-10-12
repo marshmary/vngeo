@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 import type { LoginFormData, SignUpFormData } from '@/types/auth.types';
 
 export class AuthService {
@@ -62,7 +63,7 @@ export class AuthService {
   /**
    * Listen to auth state changes
    */
-  static onAuthStateChange(callback: (event: string, session: any) => void) {
+  static onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     return supabase.auth.onAuthStateChange(callback);
   }
 

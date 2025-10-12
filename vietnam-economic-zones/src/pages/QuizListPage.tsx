@@ -73,10 +73,10 @@ const QuizListPage: React.FC = () => {
             {t('quizList.difficulty')}
           </span>
           <div className="flex gap-2">
-            {['all', 'easy', 'medium', 'hard'].map((diff) => (
+            {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
               <button
                 key={diff}
-                onClick={() => setFilterDifficulty(diff as any)}
+                onClick={() => setFilterDifficulty(diff)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filterDifficulty === diff
                     ? 'bg-indigo-600 text-white'

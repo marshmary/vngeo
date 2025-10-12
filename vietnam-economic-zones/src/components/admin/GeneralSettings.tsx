@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/uiStore';
 import { SettingsService } from '@/services/settingsService';
@@ -15,11 +15,7 @@ const GeneralSettings: React.FC = () => {
   const [originalVideoUrl, setOriginalVideoUrl] = useState('');
   const [originalFeedbackUrl, setOriginalFeedbackUrl] = useState('');
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setIsLoading(true);
       const [videoUrlData, feedbackUrlData] = await Promise.all([
@@ -42,7 +38,11 @@ const GeneralSettings: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showNotification, t]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const handleVideoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUrl = e.target.value;

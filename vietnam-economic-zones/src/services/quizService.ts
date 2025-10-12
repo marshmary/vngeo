@@ -13,6 +13,22 @@ interface QuizRow {
   created_by: string;
 }
 
+interface QuestionRow {
+  id: string;
+  question: string;
+  explanation: string | null;
+  allow_multiple_answers: boolean;
+  order_index: number;
+  quiz_options?: OptionRow[];
+}
+
+interface OptionRow {
+  id: string;
+  text: string;
+  is_correct: boolean;
+  order_index: number;
+}
+
 export class QuizService {
   private static cache: Map<string, { data: Quiz; timestamp: number }> = new Map();
   private static listCache: { data: Quiz[]; timestamp: number } | null = null;
@@ -124,15 +140,15 @@ export class QuizService {
       timeLimit: quizRow.time_limit || undefined,
       createdAt: quizRow.created_at,
       updatedAt: quizRow.updated_at,
-      questions: (questions || []).map((q: any) => ({
+      questions: (questions || []).map((q: QuestionRow) => ({
         id: q.id,
         question: q.question,
         explanation: q.explanation || undefined,
         allowMultipleAnswers: q.allow_multiple_answers,
         order: q.order_index,
         options: (q.quiz_options || [])
-          .sort((a: any, b: any) => a.order_index - b.order_index)
-          .map((o: any) => ({
+          .sort((a: OptionRow, b: OptionRow) => a.order_index - b.order_index)
+          .map((o: OptionRow) => ({
             id: o.id,
             text: o.text,
             isCorrect: o.is_correct
@@ -197,7 +213,13 @@ export class QuizService {
     console.log('[QuizService] Updating quiz metadata:', quizId);
 
     // Build update object with only defined fields
-    const updateData: any = {};
+    const updateData: Partial<{
+      title: string;
+      description: string;
+      difficulty: 'easy' | 'medium' | 'hard';
+      status: 'draft' | 'published' | 'archived';
+      time_limit: number;
+    }> = {};
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.difficulty !== undefined) updateData.difficulty = updates.difficulty;

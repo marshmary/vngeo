@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
@@ -21,12 +21,7 @@ const QuizManager: React.FC = () => {
   const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
   const [showCreateConfirmModal, setShowCreateConfirmModal] = useState(false);
 
-  // Load quizzes on mount
-  useEffect(() => {
-    loadQuizzes();
-  }, []);
-
-  const loadQuizzes = async () => {
+  const loadQuizzes = useCallback(async () => {
     try {
       setIsLoading(true);
       const loadedQuizzes = await QuizService.getAllQuizzes();
@@ -37,7 +32,12 @@ const QuizManager: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  // Load quizzes on mount
+  useEffect(() => {
+    loadQuizzes();
+  }, [loadQuizzes]);
 
   const handleCreateQuiz = () => {
     if (newQuiz.title && newQuiz.description) {
@@ -230,7 +230,6 @@ const QuizManager: React.FC = () => {
                         className="w-3 h-3 text-gray-400 cursor-help"
                         fill="currentColor"
                         viewBox="0 0 20 20"
-                        title={t(`admin.quiz.statusDescriptions.${quiz.status}`)}
                       >
                         <path
                           fillRule="evenodd"

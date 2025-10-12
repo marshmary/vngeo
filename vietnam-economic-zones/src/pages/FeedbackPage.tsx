@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useUIStore } from '@/stores/uiStore';
 import { SettingsService } from '@/services/settingsService';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -9,11 +9,7 @@ const FeedbackPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadFeedbackUrl();
-  }, []);
-
-  const loadFeedbackUrl = async () => {
+  const loadFeedbackUrl = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -34,7 +30,11 @@ const FeedbackPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [language]);
+
+  useEffect(() => {
+    loadFeedbackUrl();
+  }, [loadFeedbackUrl]);
 
   if (isLoading) {
     return (

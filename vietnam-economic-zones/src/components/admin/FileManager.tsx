@@ -117,7 +117,7 @@ const FileManager: React.FC = () => {
   };
 
 
-  const getFileType = (filename: string, mimetype?: string, metadata?: any): FileItem['type'] => {
+  const getFileType = (filename: string, mimetype?: string, metadata?: Record<string, unknown>): FileItem['type'] => {
     // Check if it's a folder using Supabase Storage conventions
     // Folders have null id in the metadata or specific mimetype
     if (!metadata || mimetype === 'application/x-directory') {
