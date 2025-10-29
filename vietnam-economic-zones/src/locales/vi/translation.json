@@ -173,6 +173,24 @@
         "createFailed": "Không thể tạo bài kiểm tra. Vui lòng thử lại.",
         "deleteFailed": "Không thể xóa bài kiểm tra. Vui lòng thử lại."
       }
+    },
+    "analyticsTab": "Thống Kê",
+    "analytics": {
+      "title": "Thống Kê Truy Cập",
+      "subtitle": "Theo dõi lượt truy cập và tương tác của người dùng",
+      "noData": "Không có dữ liệu thống kê",
+      "refresh": "Làm mới",
+      "totalVisits": "Tổng Lượt Truy Cập",
+      "visitsToday": "Truy Cập Hôm Nay",
+      "uniqueVisitors": "Khách Truy Cập Duy Nhất",
+      "avgSessionTime": "Thời Gian Trung Bình",
+      "allTime": "Tất cả thời gian",
+      "last24Hours": "24 giờ qua",
+      "today": "Hôm nay",
+      "perSession": "Mỗi phiên",
+      "hourlyVisits": "Lượt Truy Cập Theo Giờ (24 Giờ Qua)",
+      "deviceBreakdown": "Phân Loại Thiết Bị",
+      "mostVisitedPages": "Trang Được Truy Cập Nhiều Nhất"
     }
   },
   "quizList": {

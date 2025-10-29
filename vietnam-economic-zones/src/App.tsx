@@ -14,6 +14,7 @@ import AdminRoute from './components/auth/AdminRoute';
 import Sidebar from './components/common/Sidebar';
 import Notification from './components/common/Notification';
 import { initializeAuth } from './stores/authStore';
+import { useAnalyticsTracking } from './hooks/useAnalyticsTracking';
 import './index.css';
 
 function AppContent() {
@@ -21,6 +22,9 @@ function AppContent() {
   const showSidebar = location.pathname !== '/login';
   const isMapPage = location.pathname === '/';
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Track page visits and analytics
+  useAnalyticsTracking();
 
   // Prevent body scroll on map page
   useEffect(() => {

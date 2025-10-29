@@ -173,6 +173,24 @@
         "createFailed": "Failed to create quiz. Please try again.",
         "deleteFailed": "Failed to delete quiz. Please try again."
       }
+    },
+    "analyticsTab": "Analytics",
+    "analytics": {
+      "title": "Website Analytics",
+      "subtitle": "Track website visits and user engagement",
+      "noData": "No analytics data available",
+      "refresh": "Refresh",
+      "totalVisits": "Total Visits",
+      "visitsToday": "Visits Today",
+      "uniqueVisitors": "Unique Visitors",
+      "avgSessionTime": "Avg. Session Time",
+      "allTime": "All time",
+      "last24Hours": "Last 24 hours",
+      "today": "Today",
+      "perSession": "Per session",
+      "hourlyVisits": "Hourly Visits (Last 24 Hours)",
+      "deviceBreakdown": "Device Breakdown",
+      "mostVisitedPages": "Most Visited Pages"
     }
   },
   "quizList": {
