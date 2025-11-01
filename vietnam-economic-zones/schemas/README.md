@@ -9,6 +9,7 @@ For a **fresh database setup**, run the SQL files in this **exact order**:
 1. **`01_general_settings.sql`** - General application settings (Required)
 2. **`02_quiz_complete_schema.sql`** - Quiz system schema (Required)
 3. **`03_quiz_sample_data.sql`** - Sample quiz data (Optional - for testing)
+4. **`04_analytics_tracking.sql`** - Website analytics tracking (Optional - for admin dashboard)
 
 ### ⚡ How to Execute
 
@@ -17,6 +18,7 @@ For a **fresh database setup**, run the SQL files in this **exact order**:
 # 1. Copy contents of 01_general_settings.sql → Run
 # 2. Copy contents of 02_quiz_complete_schema.sql → Run
 # 3. Copy contents of 03_quiz_sample_data.sql → Run (optional)
+# 4. Copy contents of 04_analytics_tracking.sql → Run (optional - for analytics)
 ```
 
 ---
@@ -104,6 +106,55 @@ For a **fresh database setup**, run the SQL files in this **exact order**:
 
 ---
 
+### 4. `04_analytics_tracking.sql` ⭐ **Analytics Tracking Schema**
+
+**Purpose:** Website analytics and visitor tracking system for the admin dashboard.
+
+**What it does:**
+- Creates `page_visits` table for tracking individual page views
+- Stores session information, device details, and visitor metadata
+- Sets up performance indexes for fast queries
+- Creates analytics views for aggregated statistics
+- Includes helper functions for common analytics queries
+- Enables RLS with public insert (tracking) and authenticated read (dashboard)
+
+**What it tracks:**
+- 📊 Page visits with timestamps and referrer
+- 🔄 Session tracking with duration
+- 👥 Unique visitors (persistent ID)
+- 🖥️ Device type, browser, and OS information
+- 👤 User authentication status
+- 🌍 Optional country tracking
+
+**When to use:**
+- After running `01_general_settings.sql` (required for core setup)
+- When you want to add analytics tracking to the application
+- For admin dashboard metrics
+- Optional but recommended for production deployments
+
+**How to use:**
+1. Ensure `01_general_settings.sql` has been run first
+2. Open Supabase SQL Editor
+3. Copy and paste the entire file
+4. Click "Run"
+5. Verify success messages in output
+
+**Features:**
+- 🔓 Public insert for anonymous tracking
+- 🔐 Authenticated-only read for privacy
+- 📊 Pre-built analytics views and functions
+- ⚡ Performance-optimized indexes
+- 🧹 Data retention cleanup function
+
+**Helper Functions:**
+- `get_total_visits()` - Get total visit count
+- `get_visits_by_date_range(start, end)` - Visits for date range
+- `get_hourly_visits_24h()` - Hourly breakdown (last 24h)
+- `get_most_visited_pages(limit, start_date)` - Popular pages
+- `cleanup_old_analytics()` - Remove data older than 1 year
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### For Fresh Setup (New Database)
@@ -125,6 +176,11 @@ For a **fresh database setup**, run the SQL files in this **exact order**:
 -- File: 03_quiz_sample_data.sql
 -- Creates: 3 sample quizzes with 18 questions
 -- Purpose: Test data for development
+
+-- Step 4: Analytics Tracking (OPTIONAL - for admin dashboard)
+-- File: 04_analytics_tracking.sql
+-- Creates: page_visits table with analytics functions
+-- Purpose: Website visitor tracking and statistics
 ```
 
 **⚠️ IMPORTANT:** You must have at least one user in `auth.users` before running sample data.
@@ -207,6 +263,24 @@ quiz_options (02_quiz_complete_schema.sql)
 ├── is_correct (BOOLEAN)
 ├── order_index (INTEGER)
 └── created_at (TIMESTAMP)
+
+page_visits (04_analytics_tracking.sql)
+├── id (UUID, PK)
+├── page_path (VARCHAR) - URL path visited
+├── page_title (VARCHAR) - Page title
+├── referrer (VARCHAR) - Referrer URL
+├── session_id (VARCHAR) - Session identifier
+├── visitor_id (VARCHAR) - Persistent visitor ID
+├── user_id (UUID, FK → auth.users) - Optional authenticated user
+├── is_authenticated (BOOLEAN) - User auth status
+├── user_agent (TEXT) - Browser user agent
+├── device_type (VARCHAR) - mobile|tablet|desktop
+├── browser (VARCHAR) - Browser name
+├── os (VARCHAR) - Operating system
+├── country_code (VARCHAR) - Optional country
+├── visit_timestamp (TIMESTAMP) - Visit time
+├── session_duration (INTEGER) - Session length in seconds
+└── created_at (TIMESTAMP)
 ```
 
 ### 🔐 Security Rules (RLS Policies)
@@ -225,6 +299,13 @@ quiz_options (02_quiz_complete_schema.sql)
 - ✅ **Anyone** can view questions/options from published quizzes
 - ✅ **Quiz creators** can manage questions/options for their own quizzes
 - ✅ Both USING and WITH CHECK clauses ensure proper INSERT/UPDATE validation
+
+**Page Visits (Analytics):**
+- ✅ **Public Insert:** Anyone can record visits (anonymous tracking)
+- ✅ **Authenticated Read:** Only logged-in users can view analytics data
+- ✅ **User Privacy:** Users can view their own visit history
+- ✅ **Immutable Data:** No updates/deletes allowed (data integrity)
+- ✅ Use case: Track all visitors, but only admins can see statistics
 
 ---
 
