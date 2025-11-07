@@ -17,22 +17,23 @@ When using `FOR ALL` policy, both clauses are required:
 ## The Fix
 
 ### Option 1: Quick Fix (Recommended)
-Run the SQL script in `SUPABASE_QUIZ_SCHEMA_FIX.sql`:
+Run the SQL script in `QUIZ_403_ERROR_FIX.sql`:
 
 ```sql
 -- This script will:
 -- 1. Drop the existing incomplete policies
 -- 2. Recreate them with both USING and WITH CHECK clauses
+-- 3. Verify the fix was applied correctly
 ```
 
 **Steps:**
 1. Open Supabase SQL Editor
-2. Copy and paste the contents of `SUPABASE_QUIZ_SCHEMA_FIX.sql`
+2. Copy and paste the contents of `QUIZ_403_ERROR_FIX.sql`
 3. Run the script
-4. Verify the policies are created (the script includes a verification query)
+4. Check the verification output to confirm policies are correct
 
 ### Option 2: Fresh Installation
-If you're setting up a new database, use the updated `SUPABASE_QUIZ_SCHEMA.sql` file which now includes the correct policies with both `USING` and `WITH CHECK` clauses.
+If you're setting up a new database, use the updated `02_quiz_complete_schema.sql` file which now includes the correct policies with both `USING` and `WITH CHECK` clauses.
 
 ## What Changed
 
@@ -101,8 +102,8 @@ Instead of `FOR ALL`, you could create separate policies:
 But `FOR ALL` with both clauses is cleaner and easier to maintain.
 
 ## Related Files
-- `SUPABASE_QUIZ_SCHEMA.sql` - Updated main schema file
-- `SUPABASE_QUIZ_SCHEMA_FIX.sql` - Quick fix script for existing databases
+- `02_quiz_complete_schema.sql` - Complete schema with all fixes (for fresh installations)
+- `QUIZ_403_ERROR_FIX.sql` - Quick fix script for existing databases (recommended)
 - `src/services/quizService.ts` - Quiz save logic (no changes needed)
 
 ## References

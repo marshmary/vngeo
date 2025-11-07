@@ -106,7 +106,45 @@ For a **fresh database setup**, run the SQL files in this **exact order**:
 
 ---
 
-### 4. `04_analytics_tracking.sql` ⭐ **Analytics Tracking Schema**
+### 4. `QUIZ_403_ERROR_FIX.sql` 🔧 **Quiz 403 Error Quick Fix**
+
+**Purpose:** Fixes 403 Forbidden errors when saving quizzes by updating RLS policies.
+
+**What it does:**
+- Drops incomplete RLS policies on `quiz_questions` and `quiz_options`
+- Recreates policies with both USING and WITH CHECK clauses
+- Includes verification queries to confirm fix
+- Safe to run on existing databases (won't affect data)
+
+**When to use:**
+- **When experiencing 403 errors** saving quizzes
+- **Existing databases** that need policy updates
+- **Quick fix** without recreating entire schema
+
+**Symptoms that indicate you need this:**
+- ❌ 403 Forbidden error when creating quiz questions
+- ❌ 403 Forbidden error when adding quiz options
+- ❌ 403 Forbidden error when saving quiz edits
+- ✅ Quiz creation works but can't add questions
+
+**How to use:**
+1. Open Supabase SQL Editor
+2. Copy and paste the entire `QUIZ_403_ERROR_FIX.sql` file
+3. Click "Run"
+4. Check verification output - should show both USING and WITH CHECK clauses
+
+**Why this happens:**
+RLS policies need both clauses for `FOR ALL` operations:
+- `USING` - Controls SELECT, UPDATE, DELETE (checks existing rows)
+- `WITH CHECK` - Controls INSERT and UPDATE (validates new data)
+
+**Alternative:** For fresh installations, use `02_quiz_complete_schema.sql` which already includes the fix.
+
+**Related Documentation:** See `QUIZ_403_ERROR_FIX.md` for detailed explanation.
+
+---
+
+### 5. `04_analytics_tracking.sql` ⭐ **Analytics Tracking Schema**
 
 **Purpose:** Website analytics and visitor tracking system for the admin dashboard.
 
@@ -315,9 +353,17 @@ page_visits (04_analytics_tracking.sql)
 
 **Symptom:** Getting 403 errors when saving quizzes or adding questions.
 
-**Cause:** Missing or incorrect RLS policies.
+**Cause:** Missing or incorrect RLS policies (missing WITH CHECK clauses).
 
-**Solution:** Run `quiz_complete_schema.sql` to recreate all policies with the correct USING and WITH CHECK clauses.
+**Solution (Quick Fix - Recommended):**
+1. Run `05_quiz_403_error_fix.sql` to update only the problematic policies
+2. This is safe and won't affect your existing data
+
+**Solution (Full Recreate):**
+1. Run `02_quiz_complete_schema.sql` to recreate all tables and policies
+2. This will preserve your data but recreate all policies
+
+**Documentation:** See `QUIZ_403_ERROR_FIX.md` for detailed explanation of the issue and fix.
 
 ### Cannot View Quizzes in Navigation
 
@@ -376,7 +422,12 @@ If you're migrating from the old schema files (SUPABASE_QUIZ_SCHEMA.sql):
 
 ## Related Documentation
 
-- [Quiz 403 Error Fix Guide](../QUIZ_403_ERROR_FIX.md)
+### In This Directory
+- `QUIZ_403_ERROR_FIX.md` - Detailed explanation of 403 error and fix
+- `QUIZ_403_ERROR_FIX.sql` - Quick fix SQL script for 403 errors
+- `QUICK_START.md` - Quick start guide for database setup
+
+### External Resources
 - [Supabase RLS Documentation](https://supabase.com/docs/guides/auth/row-level-security)
 - [PostgreSQL RLS Guide](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 
