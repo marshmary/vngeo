@@ -66,7 +66,7 @@ export const createQuizQuestion = (overrides: Partial<QuizQuestion> = {}): QuizQ
   return {
     id: faker.string.uuid(),
     quizId: faker.string.uuid(),
-    text: faker.lorem.question(),
+    text: faker.lorem.sentence({ min: 5, max: 15 }) + '?',
     order: faker.number.int({ min: 0, max: 10 }),
     options,
     allowMultiple: faker.datatype.boolean(),

@@ -85,12 +85,13 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Information Sidebar - Hidden on mobile, visible from iPad Pro up */}
-            <div className="hidden xl:block w-96 bg-white shadow-xl border-l border-gray-200 overflow-y-auto p-6">
+            <div data-testid="zone-details" className="hidden xl:block w-96 bg-white shadow-xl border-l border-gray-200 overflow-y-auto p-6">
               {selectedZoneData ? (
                 <>
                   {/* Close Button */}
                   <div className="flex justify-end mb-4">
                     <button
+                      data-testid="zone-details-close"
                       onClick={() => setSelectedZone(null)}
                       className="text-gray-400 hover:text-gray-600 p-1 rounded"
                     >
@@ -249,6 +250,7 @@ const HomePage: React.FC = () => {
                     {zones.map((zone) => (
                       <button
                         key={zone.id}
+                        data-testid={`zone-link-${zone.id}`}
                         onClick={() => setSelectedZone(zone.id)}
                         className="w-full text-left p-2 rounded-lg hover:bg-gray-50 border border-gray-100 transition-colors"
                       >

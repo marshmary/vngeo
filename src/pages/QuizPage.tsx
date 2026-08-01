@@ -166,7 +166,7 @@ const QuizPage: React.FC = () => {
     const isPassing = percentage >= 70;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div data-testid="quiz-results" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="container mx-auto px-6 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Summary Card */}
@@ -204,7 +204,7 @@ const QuizPage: React.FC = () => {
                   <div className="text-2xl font-bold text-red-600">{quiz.questions.length - score}</div>
                   <div className="text-sm text-gray-600">{language === 'vi' ? 'Sai' : 'Incorrect'}</div>
                 </div>
-                <div className="bg-indigo-50 rounded-lg p-4">
+                <div data-testid="score-display" className="bg-indigo-50 rounded-lg p-4">
                   <div className="text-2xl font-bold text-indigo-600">{percentage}%</div>
                   <div className="text-sm text-gray-600">{language === 'vi' ? 'Điểm số' : 'Score'}</div>
                 </div>
@@ -344,7 +344,7 @@ const QuizPage: React.FC = () => {
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div data-testid="quiz-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -362,20 +362,20 @@ const QuizPage: React.FC = () => {
             </div>
             
             {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div data-testid="quiz-progress" className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
             <div className="flex justify-between text-sm text-gray-600 mt-2">
-              <span>Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
+              <span data-testid="current-question-index">Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
               <span>{Math.round(progress)}% Complete</span>
             </div>
           </div>
 
           {/* Question */}
-          <div className="bg-white rounded-2xl shadow-sm p-8 mb-6">
+          <div data-testid="quiz-question" className="bg-white rounded-2xl shadow-sm p-8 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
               {currentQuestion.question}
             </h2>
@@ -393,6 +393,8 @@ const QuizPage: React.FC = () => {
                 return (
                   <label
                     key={option.id}
+                    data-testid="quiz-option"
+                    data-option-id={option.id}
                     className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       isSelected
                         ? 'border-indigo-500 bg-indigo-50'
@@ -432,6 +434,7 @@ const QuizPage: React.FC = () => {
           {/* Navigation */}
           <div className="flex justify-between">
             <button
+              data-testid="previous-question-button"
               onClick={handlePreviousQuestion}
               disabled={currentQuestionIndex === 0}
               className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -442,6 +445,7 @@ const QuizPage: React.FC = () => {
             <div className="flex gap-3">
               {currentQuestionIndex === quiz.questions.length - 1 ? (
                 <button
+                  data-testid="submit-quiz-button"
                   onClick={handleSubmitQuiz}
                   className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                 >
@@ -449,6 +453,7 @@ const QuizPage: React.FC = () => {
                 </button>
               ) : (
                 <button
+                  data-testid="next-question-button"
                   onClick={handleNextQuestion}
                   className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >

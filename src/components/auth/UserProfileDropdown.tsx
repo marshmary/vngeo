@@ -54,6 +54,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
   if (!user) {
     return (
       <button
+        data-testid="login-button-sidebar"
         onClick={() => navigate('/login')}
         className={`bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center ${
           isCollapsed ? 'justify-center w-10 h-10' : 'gap-2 px-4 py-2 w-full'
@@ -85,6 +86,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
           <>
             <Menu.Button
               ref={buttonRef}
+              data-testid="user-menu-button"
               className={`flex items-center focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg p-1 ${isCollapsed ? 'justify-center' : 'space-x-2'}`}
             >
               {/* User Avatar */}
@@ -132,6 +134,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
               <Menu.Item>
                 {({ active }) => (
                   <button
+                    data-testid="admin-dashboard-link"
                     onClick={() => navigate('/admin')}
                     className={`${
                       active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'
@@ -151,6 +154,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
             <Menu.Item>
               {({ active }) => (
                 <button
+                  data-testid="logout-button"
                   onClick={handleSignOut}
                   className={`${
                     active ? 'bg-red-50 text-red-700' : 'text-gray-700'

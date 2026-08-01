@@ -1,5 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load E2E test env (TEST_ENV, TEST_USER_EMAIL, TEST_ADMIN_EMAIL, ...) from
+// playwright/.env into process.env. Kept separate from the app's Vite .env.local.
+// Test workers are forked after the config loads, so they inherit these values.
+dotenv.config({ path: path.resolve(__dirname, './playwright/.env') });
 
 /**
  * Playwright Configuration for Vietnam Economic Zones E2E Tests
