@@ -37,9 +37,9 @@ const FileManager: React.FC = () => {
           return {
             id: file.id || fullPath, // Use Supabase ID or fallback to path
             name: file.name,
-            type: getFileType(file.name, file.metadata?.mimetype, file.metadata),
+            type: getFileType(file.name, file.metadata?.mimetype, file.metadata ?? undefined),
             size: file.metadata?.size || 0,
-            uploadedAt: new Date(file.created_at),
+            uploadedAt: new Date(file.created_at ?? Date.now()),
             uploadedBy: user?.user_metadata?.username || user?.email || 'Unknown',
             path: fullPath,
           };

@@ -17,6 +17,27 @@ import type {
  * Handles all analytics tracking and data retrieval operations
  */
 export class AnalyticsService {
+  /**
+   * Ensure the Supabase auth session has been restored before issuing
+   * analytics RETRIEVAL queries. The admin dashboard reads are gated by an
+   * `auth.role() = 'authenticated'` RLS policy; if a query fires before the
+   * supabase-js client has finished restoring the persisted session (the
+   * cold-load race), the policy returns zero rows and the dashboard renders
+   * empty. Awaiting `getSession()` serializes the read correctly.
+   *
+   * NOTE: this is intentionally applied ONLY to retrieval methods. Tracking
+   * writes (`trackPageVisit`, `updateSessionDuration`) must remain ungated so
+   * anonymous visitors can be tracked — the `page_visits` INSERT policy is
+   * `WITH CHECK (true)` by design.
+   */
+  private static async ensureAuthReady(): Promise<void> {
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      console.warn('[AnalyticsService] getSession threw, proceeding:', error);
+    }
+  }
+
   // ================================================================
   // TRACKING METHODS
   // ================================================================
@@ -78,6 +99,8 @@ export class AnalyticsService {
    */
   static async getAnalyticsStats(): Promise<AnalyticsStats | null> {
     try {
+      await this.ensureAuthReady();
+
       // Get total visits
       const { count: totalVisits } = await supabase
         .from('page_visits')
@@ -150,6 +173,8 @@ export class AnalyticsService {
    */
   static async getHourlyVisits24h(): Promise<HourlyVisitData[]> {
     try {
+      await this.ensureAuthReady();
+
       const { data, error } = await supabase
         .rpc('get_hourly_visits_24h');
 
@@ -173,6 +198,8 @@ export class AnalyticsService {
     startDate?: Date
   ): Promise<MostVisitedPage[]> {
     try {
+      await this.ensureAuthReady();
+
       const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default 30 days
 
       const { data, error } = await supabase
@@ -198,6 +225,8 @@ export class AnalyticsService {
    */
   static async getDeviceBreakdown(days: number = 30): Promise<DeviceBreakdown[]> {
     try {
+      await this.ensureAuthReady();
+
       const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
       const { data, error } = await supabase
@@ -237,6 +266,8 @@ export class AnalyticsService {
    */
   static async getBrowserStats(days: number = 30): Promise<BrowserStats[]> {
     try {
+      await this.ensureAuthReady();
+
       const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
       const { data, error } = await supabase
@@ -280,6 +311,8 @@ export class AnalyticsService {
    */
   static async getVisitTrend(days: number = 30): Promise<VisitTrendData[]> {
     try {
+      await this.ensureAuthReady();
+
       const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
       const endDate = new Date();
 
@@ -294,7 +327,7 @@ export class AnalyticsService {
         return [];
       }
 
-      return (data || []).map((item: any) => ({
+      return (data || []).map((item: { visit_date: string; total_visits: number; unique_visitors: number }) => ({
         date: item.visit_date,
         total_visits: item.total_visits,
         unique_visitors: item.unique_visitors,
@@ -310,6 +343,8 @@ export class AnalyticsService {
    */
   static async getAllVisits(limit: number = 100): Promise<PageVisit[]> {
     try {
+      await this.ensureAuthReady();
+
       const { data, error } = await supabase
         .from('page_visits')
         .select('*')

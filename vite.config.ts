@@ -21,8 +21,4 @@ export default defineConfig({
       },
     },
   },
-  esbuild: {
-    // Remove debugger statements in development and production
-    drop: ['debugger'],
-  },
 })

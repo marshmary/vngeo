@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { AnalyticsService } from '@/services/analyticsService';
 import type { CreatePageVisitData } from '@/types/analytics.types';
 
@@ -142,7 +142,7 @@ export function useAnalyticsTracking() {
  */
 export function useAnalyticsEvent() {
   return {
-    trackEvent: async (eventName: string, eventData?: Record<string, any>) => {
+    trackEvent: async (eventName: string, eventData?: Record<string, unknown>) => {
       // This can be extended in the future for custom event tracking
       console.log('Custom event tracked:', eventName, eventData);
     },

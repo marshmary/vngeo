@@ -1,6 +1,6 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Menu, Transition } from '@headlessui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faChevronDown, faGear, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';

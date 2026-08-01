@@ -3,10 +3,27 @@ import type { GeneralSetting, SettingKey } from '@/types/settings.types';
 
 export class SettingsService {
   /**
+   * Ensure the Supabase auth session has been restored before issuing queries.
+   * Although `general_settings` reads are public (`USING (true)`), awaiting
+   * `getSession()` avoids the cold-load race where a query fires before the
+   * client has finished initializing, which can return inconsistent results.
+   * Resolves to a null session for anonymous users, which is the correct
+   * state for the public read policy.
+   */
+  private static async ensureAuthReady(): Promise<void> {
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      console.warn('[SettingsService] getSession threw, proceeding:', error);
+    }
+  }
+
+  /**
    * Get a setting by key
    */
   static async getSetting(key: SettingKey): Promise<string | null> {
     try {
+      await this.ensureAuthReady();
       const { data, error } = await supabase
         .from('general_settings')
         .select('value')

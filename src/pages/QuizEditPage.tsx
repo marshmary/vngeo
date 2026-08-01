@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { useUIStore } from '@/stores/uiStore';
 import { QuizService, QuizDraftService } from '@/services/quizService';
 import type { Quiz, QuizQuestion, QuizOption } from '@/types/quiz.types';

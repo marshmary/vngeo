@@ -27,6 +27,26 @@ export class DocumentsPageService {
 
 
   /**
+   * Ensure the Supabase auth session has been restored before issuing storage
+   * requests. The supabase-js client restores the persisted session
+   * asynchronously on startup; if a storage `.list()` fires before that
+   * completes, the request goes out without an Authorization header and the
+   * storage RLS policies return restricted/empty results — which manifests as
+   * the documents page appearing empty on first load (refresh fixes it because
+   * the session is already in memory). `getSession()` resolves once the
+   * restoration is finished, so awaiting it serializes the fetch correctly.
+   */
+  private static async ensureAuthReady(): Promise<void> {
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      // getSession() never rejects in practice (it returns {error} in-band),
+      // but guard anyway so an auth failure never blocks storage reads.
+      console.warn('[DocumentsPageService] getSession threw, proceeding:', error);
+    }
+  }
+
+  /**
    * Get all documents organized by folders
    * @param forceRefresh - If true, bypass cache and fetch fresh data
    */
@@ -50,6 +70,11 @@ export class DocumentsPageService {
       console.log('[DocumentsPageService] Reusing pending request');
       return this.pendingRequest;
     }
+
+    // Wait for the auth session to be restored before fetching. This prevents
+    // the first-load race where the storage request fires before the access
+    // token is available, yielding an empty result that gets cached.
+    await this.ensureAuthReady();
 
     // Create new request
     this.pendingRequest = this.fetchDocumentsFromStorage();
@@ -165,8 +190,8 @@ export class DocumentsPageService {
             name: file.name,
             path: fullPath,
             size: file.metadata?.size || 0,
-            created_at: file.created_at,
-            updated_at: file.updated_at,
+            created_at: file.created_at ?? new Date().toISOString(),
+            updated_at: file.updated_at ?? new Date().toISOString(),
             mimetype: file.metadata?.mimetype || 'application/octet-stream',
             folder: folderName,
             downloadUrl: urlData.publicUrl,
@@ -197,8 +222,8 @@ export class DocumentsPageService {
             name: item.name,
             path: item.name,
             size: item.metadata?.size || 0,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
+            created_at: item.created_at ?? new Date().toISOString(),
+            updated_at: item.updated_at ?? new Date().toISOString(),
             mimetype: item.metadata?.mimetype || 'application/octet-stream',
             folder: 'General',
             downloadUrl: urlData.publicUrl,
@@ -266,8 +291,8 @@ export class DocumentsPageService {
           name: file.name,
           path: `${folderName}/${file.name}`,
           size: file.metadata?.size || 0,
-          created_at: file.created_at,
-          updated_at: file.updated_at,
+          created_at: file.created_at ?? new Date().toISOString(),
+          updated_at: file.updated_at ?? new Date().toISOString(),
           mimetype: file.metadata?.mimetype || 'application/octet-stream',
           folder: folderName,
           downloadUrl: urlData.publicUrl,

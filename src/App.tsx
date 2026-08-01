@@ -1,6 +1,6 @@
 // Remove unused React import as JSX transform handles it
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router';
 import HomePage from './pages/HomePage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';

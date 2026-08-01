@@ -33,7 +33,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload, onCreateFolder, onClo
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const files = Array.from(e.dataTransfer.files);
-      const maxSize = import.meta.env.VITE_SUPABASE_MAX_FILE_SIZE || 52428800;
+      const maxSize = DocumentService.getMaxFileSizeBytes();
 
       // Check for oversized files
       const oversizedFiles = files.filter(file => file.size > maxSize);
@@ -53,7 +53,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload, onCreateFolder, onClo
     e.preventDefault();
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
-      const maxSize = import.meta.env.VITE_SUPABASE_MAX_FILE_SIZE || 52428800;
+      const maxSize = DocumentService.getMaxFileSizeBytes();
 
       // Check for oversized files
       const oversizedFiles = files.filter(file => file.size > maxSize);

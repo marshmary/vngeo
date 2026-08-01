@@ -1,27 +1,48 @@
 import { supabase } from '@/lib/supabase';
 
 export interface StorageFile {
-  id?: string;
+  id?: string | null;
   name: string;
-  bucket_id?: string;
-  created_at: string;
-  updated_at: string;
-  last_accessed_at?: string;
+  bucket_id?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  last_accessed_at?: string | null;
   metadata?: {
     size?: number;
     mimetype?: string;
     [key: string]: unknown;
-  };
+  } | null;
 }
 
 export class DocumentService {
   private static BUCKET_NAME = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || 'documents';
-  private static MAX_FILE_SIZE = import.meta.env.VITE_SUPABASE_MAX_FILE_SIZE || 52428800;
+  // Vite exposes all VITE_* env vars as strings, so coerce to a Number.
+  // Fall back to 50MB if unset/invalid to match the documented default.
+  private static MAX_FILE_SIZE = Number(import.meta.env.VITE_SUPABASE_MAX_FILE_SIZE) || 52428800;
+
+  /**
+   * Ensure the Supabase auth session has been restored before issuing storage
+   * requests. The supabase-js client restores the persisted session
+   * asynchronously on startup; if a storage request fires before that
+   * completes, it goes out without an Authorization header and the RLS
+   * policies return restricted/empty results (the "documents don't show on
+   * first load, refresh fixes it" race). `getSession()` resolves once
+   * restoration is finished.
+   */
+  private static async ensureAuthReady(): Promise<void> {
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      console.warn('[DocumentService] getSession threw, proceeding:', error);
+    }
+  }
 
   /**
    * List files and folders in a specific path
    */
   static async listFiles(path: string = ''): Promise<StorageFile[]> {
+    await this.ensureAuthReady();
+
     const { data, error } = await supabase.storage
       .from(this.BUCKET_NAME)
       .list(path, {
@@ -110,28 +131,24 @@ export class DocumentService {
   }
 
   /**
-   * Delete a folder and all its contents
+   * Delete a folder and all its contents.
+   *
+   * Supabase Storage has no native "delete folder" — a folder is just the set
+   * of objects whose keys share a prefix. So we list everything under the
+   * prefix and delete those objects in one batch. The `.folderkeep` placeholder
+   * (if present) is just another object in that listing, so it is removed in
+   * the same batch — no separate delete call needed.
    */
   static async deleteFolder(folderPath: string): Promise<void> {
-    // List all files in the folder
     const files = await this.listFiles(folderPath);
 
-    // Delete all files in the folder
     const filePaths = files.map((file) =>
       folderPath ? `${folderPath}/${file.name}` : file.name
     );
 
-    if (filePaths.length > 0) {
-      await this.deleteFiles(filePaths);
-    }
+    if (filePaths.length === 0) return;
 
-    // Delete the folder placeholder
-    try {
-      await this.deleteFile(`${folderPath}/.folderkeep`);
-    } catch {
-      // Folder might not have a placeholder
-      console.warn('No folder placeholder found');
-    }
+    await this.deleteFiles(filePaths);
   }
 
   /**
@@ -204,5 +221,12 @@ export class DocumentService {
    */
   static getMaxFileSizeMB(): number {
     return this.MAX_FILE_SIZE / 1024 / 1024;
+  }
+
+  /**
+   * Get max file size in bytes (for direct comparison with File.size)
+   */
+  static getMaxFileSizeBytes(): number {
+    return this.MAX_FILE_SIZE;
   }
 }

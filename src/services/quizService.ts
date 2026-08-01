@@ -35,6 +35,24 @@ export class QuizService {
   private static CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   /**
+   * Ensure the Supabase auth session has been restored before issuing queries.
+   * The supabase-js client restores the persisted session asynchronously on
+   * startup; if a query fires before that completes it runs with no auth
+   * context, so `auth.uid()`-based RLS clauses evaluate to NULL and silently
+   * drop rows (e.g. a user's own draft quizzes vanish on first load; refresh
+   * fixes it). Awaiting `getSession()` serializes the query correctly. For
+   * anonymous users this resolves to a null session, which is the intended
+   * state for the public read policies.
+   */
+  private static async ensureAuthReady(): Promise<void> {
+    try {
+      await supabase.auth.getSession();
+    } catch (error) {
+      console.warn('[QuizService] getSession threw, proceeding:', error);
+    }
+  }
+
+  /**
    * Get all quizzes
    */
   static async getAllQuizzes(): Promise<Quiz[]> {
@@ -43,6 +61,8 @@ export class QuizService {
       console.log('[QuizService] Returning cached quiz list');
       return this.listCache.data;
     }
+
+    await this.ensureAuthReady();
 
     console.log('[QuizService] Fetching all quizzes from database');
     const { data: quizzes, error } = await supabase
@@ -70,6 +90,8 @@ export class QuizService {
    * Get only published quizzes (for public use)
    */
   static async getPublishedQuizzes(): Promise<Quiz[]> {
+    await this.ensureAuthReady();
+
     console.log('[QuizService] Fetching published quizzes from database');
     const { data: quizzes, error } = await supabase
       .from('quizzes')
@@ -102,6 +124,8 @@ export class QuizService {
     }
 
     console.log('[QuizService] Fetching quiz from database:', quizId);
+
+    await this.ensureAuthReady();
 
     // Fetch quiz
     const { data: quizRow, error: quizError } = await supabase
