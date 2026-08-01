@@ -14,6 +14,7 @@ build/
 # Environment files
 .env
 .env.local
+.env.local.supabase
 .env.development.local
 .env.test.local
 .env.production.local
@@ -23,7 +24,9 @@ build/
 .idea/
 .claude/
 .bmad*/
+_bmad/
 .serena/
+.zcode/
 *.swp
 *.swo
 *~
@@ -238,3 +241,5 @@ local.properties
 
 # Cursor
 .cursor/
+# Local Supabase seed documents (large PDFs - keep local, not in git)
+supabase/supabase-volumes/storage-seed/

@@ -1,0 +1,72 @@
+/**
+ * Authentication Helpers for E2E Tests
+ *
+ * Provides utilities for logging in users and managing auth state.
+ */
+
+import type { Page } from '@playwright/test';
+import type { User } from '../factories/user-factory';
+
+/**
+ * Log in a user via the UI login flow.
+ *
+ * @param page - Playwright page object
+ * @param user - User credentials (email and password)
+ * @returns Promise that resolves when login is complete
+ */
+export async function loginUser(page: Page, user: Pick<User, 'email' | 'password'>): Promise<void> {
+  await page.goto('/login');
+
+  // Fill in login form
+  await page.fill('[data-testid="email-input"]', user.email);
+  await page.fill('[data-testid="password-input"]', user.password);
+
+  // Submit form
+  await page.click('[data-testid="login-button"]');
+
+  // Wait for navigation to dashboard or home
+  await page.waitForURL('**/', { timeout: 10000 });
+}
+
+/**
+ * Log in as an admin user via the UI.
+ *
+ * @param page - Playwright page object
+ * @param adminUser - Admin user credentials
+ */
+export async function loginAdmin(page: Page, adminUser: Pick<User, 'email' | 'password'>): Promise<void> {
+  await loginUser(page, adminUser);
+
+  // Verify admin badge is visible
+  const adminBadge = page.getByTestId('admin-badge').first();
+  await adminBadge.waitFor({ state: 'visible', timeout: 5000 });
+}
+
+/**
+ * Log out the current user.
+ *
+ * @param page - Playwright page object
+ */
+export async function logoutUser(page: Page): Promise<void> {
+  await page.click('[data-testid="user-menu-button"]');
+  await page.click('[data-testid="logout-button"]');
+
+  // Wait for redirect to home or login
+  await page.waitForURL('**/login', { timeout: 10000 });
+}
+
+/**
+ * Set language preference (Vietnamese or English).
+ *
+ * @param page - Playwright page object
+ * @param language - 'vi' or 'en'
+ */
+export async function setLanguage(page: Page, language: 'vi' | 'en'): Promise<void> {
+  await page.click('[data-testid="language-selector"]');
+
+  const languageOption = page.getByTestId(`language-option-${language}`);
+  await languageOption.click();
+
+  // Wait for language change to take effect
+  await page.waitForTimeout(500);
+}
