@@ -1,0 +1,323 @@
+# Local Supabase instance for development
+# Usage: docker compose up -d
+# Dashboard: http://localhost:8000 (user: supabase / pass: your_password)
+
+services:
+  # ── Database ──────────────────────────────────────────────
+  db:
+    image: supabase/postgres:15.8.1.060
+    container_name: supabase-db
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -U supabase_admin -d postgres
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: 3600
+    ports:
+      - "5432:5432"
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+      # Mount the base-schema bootstrap + app migrations as INDIVIDUAL files
+      # (do NOT bind-mount the whole initdb.d directory — that shadows the
+      # image's built-in base scripts). 00-init-base-schema.sh runs the image's
+      # own migrate.sh to create the auth/storage schemas and roles; the app
+      # migrations (01-04) then run afterwards with those schemas available.
+      - ./supabase-volumes/db/init/00-init-base-schema.sh:/docker-entrypoint-initdb.d/00-init-base-schema.sh:Z
+      - ./supabase-volumes/db/init/01-general_settings.sql:/docker-entrypoint-initdb.d/01-general_settings.sql:Z
+      - ./supabase-volumes/db/init/02-quiz_schema.sql:/docker-entrypoint-initdb.d/02-quiz_schema.sql:Z
+      - ./supabase-volumes/db/init/03-storage.sql:/docker-entrypoint-initdb.d/03-storage.sql:Z
+      - ./supabase-volumes/db/init/04-analytics.sql:/docker-entrypoint-initdb.d/04-analytics.sql:Z
+      - ./supabase-volumes/db/init/05-storage-policies.sql:/docker-entrypoint-initdb.d/05-storage-policies.sql:Z
+
+  # ── Auth (GoTrue) ────────────────────────────────────────
+  auth:
+    image: supabase/gotrue:v2.164.0
+    container_name: supabase-auth
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
+      GOTRUE_SMTP_HOST: ${SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT}
+      GOTRUE_SMTP_USER: ${SMTP_USER}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS}
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
+      GOTRUE_MAILER_URLPATHS_INVITE: ${MAILER_URLPATHS_INVITE}
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: ${MAILER_URLPATHS_CONFIRMATION}
+      GOTRUE_MAILER_URLPATHS_RECOVERY: ${MAILER_URLPATHS_RECOVERY}
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: ${MAILER_URLPATHS_EMAIL_CHANGE}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── REST API (PostgREST) ─────────────────────────────────
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    container_name: supabase-rest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,storage,graphql_public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
+    # NOTE: postgrest is a distroless image (no shell/wget), so no in-container
+    # healthcheck is possible. Kong depends on it with `service_started`.
+
+  # ── Realtime ─────────────────────────────────────────────
+  realtime:
+    image: supabase/realtime:v2.33.9
+    container_name: supabase-realtime
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: ""
+      # AES-128-ECB key for encrypting tenant secrets (see lib/realtime/encryption.ex).
+      # MUST be exactly 16 bytes — NOT the 64-byte SECRET_KEY_BASE. Reusing
+      # SECRET_KEY_BASE here throws {:badarg, "Bad key size"} during seeds and
+      # crash-loops the container on boot. Defaults to the official 16-byte
+      # self-host value if unset.
+      DB_ENC_KEY: ${REALTIME_DB_ENC_KEY:-supabaserealtime}
+      API_JWT_SECRET: ${JWT_SECRET}
+      APP_NAME: realtime
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
+      RLIMIT_NOFILE: "1024"
+    command: >
+      sh -c "/app/bin/migrate && /app/bin/realtime eval 'Realtime.Release.seeds(Realtime.Repo)' && /app/bin/server"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/4000 && echo -e 'GET / HTTP/1.1\\r\\nhost: localhost\\r\\n\\r\\n' >&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Storage ──────────────────────────────────────────────
+  storage:
+    image: supabase/storage-api:v1.14.4
+    container_name: supabase-storage
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      imgproxy:
+        condition: service_started
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      STORAGE_BACKEND: file
+      TENANT_ID: local-dev
+      REGION: us-east-1
+      GLOBAL_S3_BUCKET: supabase-storage
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
+      # Global upload size limits. Without these, storage-api v1.14.4 reads
+      # `Number(undefined)` -> NaN as the limit and rejects EVERY upload with
+      # "Limit fileSize is not a valid number". 50MB matches the Free-tier
+      # default on Supabase cloud and the VITE_SUPABASE_MAX_FILE_SIZE in .env.
+      FILE_SIZE_LIMIT: "52428800"
+      UPLOAD_FILE_SIZE_LIMIT: "52428800"
+    volumes:
+      - supabase-storage-data:/var/lib/storage
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').connect(5000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Image Proxy ──────────────────────────────────────────
+  imgproxy:
+    image: darthsim/imgproxy:v3.24.0
+    container_name: supabase-imgproxy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/5001 && echo -e \"GET /health HTTP/1.0\\r\\n\\r\\n\" >&3 && head -n1 <&3 | grep -q 200' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+    volumes:
+      - supabase-storage-data:/var/lib/storage:ro
+
+  # ── API Gateway (Kong) ───────────────────────────────────
+  kong:
+    image: kong:2.8.1
+    container_name: supabase-kong
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+      rest:
+        condition: service_started
+      # realtime uses service_started (not service_healthy) because the
+      # realtime service has strict DB_ENC_KEY sizing requirements and is only
+      # needed for live realtime subscriptions, not core CRUD. This lets Kong
+      # (and thus the API) start even if realtime is still booting.
+      realtime:
+        condition: service_started
+      storage:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    ports:
+      - "${KONG_HTTP_PORT:-8000}:8000"
+      - "8443:8443"
+    volumes:
+      - ./supabase-volumes/kong:/var/lib/kong
+
+  # ── Studio (Dashboard) ───────────────────────────────────
+  studio:
+    image: supabase/studio:2026.07.20-sha-74a0848
+    container_name: supabase-studio
+    restart: unless-stopped
+    depends_on:
+      - auth
+      - rest
+      - storage
+      - realtime
+      - meta
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+      DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+    ports:
+      - "3001:3000"
+
+  # ── Postgres Meta ────────────────────────────────────────
+  meta:
+    image: supabase/postgres-meta:v0.84.2
+    container_name: supabase-meta
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').connect(8080,'localhost').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: supabase_admin
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+
+  # ── Seed (one-shot) ──────────────────────────────────────
+  # Auto-seeds users + quizzes/settings + documents on first boot, so the
+  # whole stack is ready after a single `docker compose up -d` — no host bash
+  # needed (works the same on Windows and Unix).
+  #
+  # Waits for GoTrue to create auth.users, applies 06-seed-users.sql +
+  # 07-seed-content.sql, uploads the PDFs from supabase-volumes/storage-seed/
+  # into the documents bucket, then writes a sentinel. The sentinel lives in
+  # a named volume, so the seed runs ONCE per fresh volume and local edits
+  # survive restarts. `docker compose down -v` wipes the sentinel → re-seed.
+  seed:
+    build:
+      context: ./supabase-volumes/seed
+      dockerfile: Dockerfile
+    container_name: supabase-seed
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+      kong:
+        # Kong has no healthcheck (only service_started). The seed's doc upload
+        # polls anyway and the service_role key works without Kong-specific auth.
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: postgres
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      # Route through Kong (not storage:5000 directly): Kong owns the
+      # /storage/v1/ prefix and strips it (strip_path: true) before forwarding
+      # to storage-api. Calling storage:5000 directly with a /storage/v1/ path
+      # 404s because storage-api's routes are mounted at the root (/object/...,
+      # /bucket/...), not under /storage/v1/.
+      STORAGE_INTERNAL_URL: http://kong:8000
+      STORAGE_BUCKET: documents
+      SEED_DIR: /seed-sql
+      DOCS_DIR: /seed-docs/documents
+      SENTINEL_FILE: /seed-sentinel/.seeded
+    volumes:
+      # SQL seed files (06 users, 07 content) — read-only.
+      - ./supabase-volumes/db/seed:/seed-sql:ro
+      # Backed-up production documents to upload into storage — read-only.
+      - ./supabase-volumes/storage-seed:/seed-docs:ro
+      # Sentinel volume — survives container recreation so the seed runs once.
+      - supabase-seed-sentinel:/seed-sentinel
+
+volumes:
+  supabase-db-data:
+  supabase-storage-data:
+  supabase-seed-sentinel:

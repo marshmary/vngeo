@@ -16,7 +16,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'vietnam-economic-zones@1.0.0',
+      'X-Client-Info': 'vngeo@1.0.0',
     },
   },
 });
