@@ -1,151 +1,134 @@
-# Source Tree Analysis - Vietnam Economic Zones
+# Source Tree Analysis — Vietnam Economic Zones (vngeo)
 
-> Generated: 2026-05-16 | Scan Level: Exhaustive
+> Verified 2026-08-01. The repo was reorganized on 2026-08-01: **the app lives at the repo root** (there is no `vietnam-economic-zones/` directory), and the entire local-Supabase/Docker stack lives under `supabase/`. Ignore `node_modules`, `dist`, `.git`, and `supabase/supabase-volumes/`.
 
-## Repository Structure
+## Annotated tree
 
 ```
-vngeo/                              # Repository root
-├── .claude/                        # Claude Code configuration
-├── .github/
-│   └── chatmodes/                  # GitHub Copilot chat modes
-├── _bmad/                          # BMAD framework configuration
-├── _bmad-output/                   # BMAD output artifacts
-├── design/                         # Design mockup images
-│   ├── f62c66f1faedb7401cbc0900990ddd67.jpg
-│   └── gbYZAE8rO1.png
-├── docs/                           # Project documentation (generated + existing)
-├── netlify.toml                    # Netlify deployment config
-├── vietnam-economic-zones/         # ★ Main application source
-│   ├── public/
-│   │   └── vietnam-map-data/       # Static GeoJSON boundary files
-│   │       ├── gadm41_VNM_0.json   # Vietnam country outline
-│   │       ├── gadm41_VNM_1.json   # Province boundaries (GADM)
-│   │       └── zones-metadata.json # Zone metadata
-│   ├── schemas/                    # SQL schema files (execution order)
-│   │   ├── 01_general_settings.sql # Key-value settings table
-│   │   ├── 02_quiz_complete_schema.sql  # Quiz tables + RLS
-│   │   ├── 03_quiz_sample_data.sql # Sample quiz seed data
-│   │   ├── 04_analytics_tracking.sql    # Page visits + functions
-│   │   ├── 05_quiz_403_error_fix.sql    # RLS WITH CHECK fix
-│   │   └── README.md              # Schema documentation
-│   ├── src/                        # ★ Application source code
-│   │   ├── main.tsx                # Entry point (createRoot)
-│   │   ├── App.tsx                 # Root component + routing
-│   │   ├── index.css               # Global styles + Tailwind
-│   │   ├── assets/                 # Static assets
-│   │   ├── components/             # React components
-│   │   │   ├── admin/              # Admin panel components
-│   │   │   │   ├── AnalyticsDashboard.tsx  # Analytics overview
-│   │   │   │   ├── DeviceBreakdownChart.tsx
-│   │   │   │   ├── FileCard.tsx
-│   │   │   │   ├── FileManager.tsx         # Document manager
-│   │   │   │   ├── FileUpload.tsx
-│   │   │   │   ├── GeneralSettings.tsx      # Settings editor
-│   │   │   │   ├── HourlyVisitsChart.tsx
-│   │   │   │   ├── QuizManager.tsx          # Quiz CRUD
-│   │   │   │   ├── StatsCard.tsx
-│   │   │   │   └── TopPagesTable.tsx
-│   │   │   ├── auth/               # Authentication components
-│   │   │   │   ├── AdminRoute.tsx          # Admin route guard
-│   │   │   │   ├── ProtectedRoute.tsx      # Auth route guard
-│   │   │   │   └── UserProfileDropdown.tsx # User menu
-│   │   │   ├── common/             # Shared components
-│   │   │   │   ├── ConfirmationModal.tsx
-│   │   │   │   ├── LoadingSpinner.tsx
-│   │   │   │   ├── NavBar.tsx              # (Legacy, unused)
-│   │   │   │   ├── Notification.tsx        # Global toast
-│   │   │   │   └── Sidebar.tsx             # Primary navigation
-│   │   │   ├── debug/              # Debug tools
-│   │   │   │   └── ProvinceDebugger.tsx
-│   │   │   ├── guide/              # Onboarding
-│   │   │   │   └── FirstTimeGuide.tsx      # 13-step tutorial
-│   │   │   ├── map/                # Map components
-│   │   │   │   ├── InteractiveMapContainer.tsx  # ★ Main map
-│   │   │   │   ├── MapContainer.tsx        # Legacy map
-│   │   │   │   ├── ParacelIslandsLabel.tsx
-│   │   │   │   ├── SpratlyIslandsLabel.tsx
-│   │   │   │   └── ZoneLayer/              # GeoJSON rendering
-│   │   │   │       └── index.tsx
-│   │   │   └── zone/               # Zone display
-│   │   │       └── ZoneCard.tsx
-│   │   ├── hooks/                  # Custom hooks
-│   │   │   └── useAnalyticsTracking.ts  # Auto page tracking
-│   │   ├── i18n/                   # i18next setup
-│   │   │   └── index.ts
-│   │   ├── lib/                    # Library configuration
-│   │   │   └── supabase.ts         # Supabase client
-│   │   ├── locales/                # Translation files
-│   │   │   ├── en/translation.json # English
-│   │   │   └── vi/translation.json # Vietnamese
-│   │   ├── pages/                  # Route pages
-│   │   │   ├── AdminPage.tsx       # /admin (tabbed: analytics, files, quiz, settings)
-│   │   │   ├── DocumentsPage.tsx   # /documents
-│   │   │   ├── FeedbackPage.tsx    # /feedback
-│   │   │   ├── HomePage.tsx        # / (main map page)
-│   │   │   ├── LoginPage.tsx       # /login
-│   │   │   ├── MapDrawingPage.tsx  # /map-drawing
-│   │   │   ├── QuizEditPage.tsx    # /admin/quiz/:quizId/edit
-│   │   │   ├── QuizListPage.tsx    # /quizzes
-│   │   │   └── QuizPage.tsx        # /quiz/:quizId
-│   │   ├── services/               # API/service layer
-│   │   │   ├── analyticsService.ts # Analytics tracking + queries
-│   │   │   ├── authService.ts      # Supabase auth wrapper
-│   │   │   ├── documentService.ts  # Supabase storage operations
-│   │   │   ├── documentsPageService.ts # Document listing + cache
-│   │   │   ├── gadmService.ts      # GeoJSON/zone boundary loading
-│   │   │   ├── quizService.ts      # Quiz CRUD + draft system
-│   │   │   └── settingsService.ts  # Key-value settings CRUD
-│   │   ├── stores/                 # Zustand state stores
-│   │   │   ├── authStore.ts        # Auth state + actions
-│   │   │   ├── mapStore.ts         # Map state (zones, selection)
-│   │   │   ├── uiStore.ts          # UI state (modals, theme, language)
-│   │   │   └── index.ts            # Barrel export
-│   │   ├── types/                  # TypeScript type definitions
-│   │   │   ├── analytics.types.ts
-│   │   │   ├── auth.types.ts
-│   │   │   ├── quiz.types.ts
-│   │   │   ├── settings.types.ts
-│   │   │   └── zone.types.ts
-│   │   └── utils/                  # Utilities
-│   │       ├── constants.ts        # Zone data, config constants
-│   │       ├── zoneProvinces.ts    # Zone-to-province mapping
-│   │       └── index.ts            # Barrel export
-│   ├── .env.example                # Environment variable template
-│   ├── eslint.config.js
-│   ├── index.html                  # HTML entry point
-│   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js          # Tailwind + custom theme
-│   ├── tsconfig.json
-│   ├── tsconfig.app.json           # App TS config (strict)
-│   ├── tsconfig.node.json
-│   └── vite.config.ts              # Vite config + Terser
-└── .gitignore
+vngeo/                          # repo root = app root
+├── index.html                  # Vite HTML entry → /src/main.tsx
+├── package.json                # name: vngeo, type: module, scripts + deps
+├── tsconfig.json               # project-ref root (→ app + node)
+├── tsconfig.app.json           # strict app config, "@/*" → ./src/*
+├── tsconfig.node.json          # build-tool config (vite.config.ts)
+├── vite.config.ts              # plugin-react, '@' alias, terser (drops console.log/info/debug)
+├── eslint.config.js            # flat config, typescript-eslint, react-hooks, react-refresh
+├── tailwind.config.js          # v3 module.exports; brand + zone tokens; Inter / Plus Jakarta Sans
+├── postcss.config.js           # tailwindcss + autoprefixer
+├── netlify.toml                # publish=dist, functions=netlify/functions (⚠️ dir absent), SPA redirects
+├── playwright.config.ts        # 5 projects, local/staging/production envs, auto-starts dev server
+├── .nvmrc                      # 20
+├── .env.local(.example)        # VITE_* (Vite frontend)
+├── README.md, REORGANIZATION.md
+│
+├── public/
+│   └── vietnam-map-data/       # static GeoJSON (GADM): gadm41_VNM_0.json (border), gadm41_VNM_1.json (provinces)
+│
+├── src/                        # app source — "@/" alias → ./src
+│   ├── main.tsx                # React bootstrap (StrictMode → <App/>)
+│   ├── App.tsx                 # BrowserRouter, initializeAuth() on mount, route table, <Sidebar/> + <Notification/>
+│   ├── App.css, index.css      # global styles; Leaflet CSS + @font CSS vars
+│   ├── assets/                 # react.svg
+│   │
+│   ├── components/             # React components (default exports)
+│   │   ├── admin/              # AnalyticsDashboard, StatsCard, HourlyVisitsChart, DeviceBreakdownChart,
+│   │   │                       # TopPagesTable, FileManager, FileCard, FileUpload, QuizManager, GeneralSettings
+│   │   ├── auth/               # AdminRoute, ProtectedRoute (unused), UserProfileDropdown
+│   │   ├── common/             # ConfirmationModal, LoadingSpinner, NavBar (unused), Notification, Sidebar
+│   │   ├── debug/              # ProvinceDebugger (legacy)
+│   │   ├── guide/              # FirstTimeGuide
+│   │   ├── map/                # InteractiveMapContainer (active), MapContainer (legacy), ZoneLayer (legacy),
+│   │   │                       # ParacelIslandsLabel, SpratlyIslandsLabel
+│   │   └── zone/               # ZoneCard
+│   │
+│   ├── pages/                  # AdminPage, DocumentsPage, FeedbackPage, HomePage, LoginPage,
+│   │                           # MapDrawingPage, QuizEditPage, QuizListPage, QuizPage
+│   ├── services/               # static Supabase service classes (authService, quizService + QuizDraftService,
+│   │                           # documentService, documentsPageService, settingsService, analyticsService) + gadmService (instance)
+│   ├── stores/                 # Zustand v5: authStore, mapStore, uiStore (+ index barrel)
+│   ├── types/                  # analytics, auth, quiz, settings, zone (.types.ts)
+│   ├── utils/                  # constants (VIETNAM_ECONOMIC_ZONES, map center/zoom), zoneProvinces, index barrel
+│   ├── hooks/                  # useAnalyticsTracking
+│   ├── lib/                    # supabase.ts (client factory)
+│   ├── i18n/index.ts           # i18next init (fallbackLng 'vi')
+│   └── locales/{en,vi}/        # translation.json (single namespace each)
+│
+├── schemas/                    # human-reference SQL (run in Supabase SQL Editor, numbered)
+│   ├── 01_general_settings.sql
+│   ├── 02_quiz_complete_schema.sql
+│   ├── 03_quiz_sample_data.sql
+│   ├── 04_analytics_tracking.sql
+│   ├── 05_quiz_403_error_fix.sql
+│   └── QUICK_START.md, QUIZ_403_ERROR_FIX.md, README.md
+│
+├── playwright/                 # E2E (run from repo root via npm run test:e2e)
+│   ├── e2e/                    # authentication.spec.ts, homepage.spec.ts, quiz.spec.ts
+│   ├── support/                # fixtures.ts, factories/ (user/quiz/document, faker), helpers/auth-helpers.ts
+│   ├── auth-sessions/          # storage state
+│   └── .env.example            # TEST_ENV, test creds, staging/production URLs
+│
+├── supabase/                   # ⬅ entire local-Supabase/Docker stack (run docker from HERE)
+│   ├── docker-compose.yml      # 10 services: db, auth, rest, realtime, storage, imgproxy, kong, studio, meta, seed
+│   ├── setup-local-supabase.sh # generates secrets, writes supabase/.env AND ../.env.local
+│   ├── .env(.example)          # Docker secrets (POSTGRES_PASSWORD, JWT_SECRET, ANON_KEY…)
+│   └── supabase-volumes/       # bind mounts: db/{init,init-base,seed}, kong, seed, storage-seed (ignored)
+│
+├── netlify/                    # ⚠️ declared in netlify.toml but DOES NOT EXIST — no functions ship
+│
+├── docs/                       # generated + existing documentation (this folder)
+├── design/                     # design assets (jpg/png)
+├── scripts/                    # verify-supabase-cloud.sh
+│
+├── _bmad-output/               # committed BMad artifacts (planning, implementation, test) + project-context.md
+├── _bmad/                      # BMad config (core, bmm, tea, custom, scripts)
+└── .claude/, .zcode/, .github/chatmodes/   # AI tooling
 ```
 
-## Entry Points
+## Critical folders
 
-| Entry Point | File | Purpose |
-|-------------|------|---------|
-| App Entry | `src/main.tsx` | React root creation, imports i18n |
-| Root Component | `src/App.tsx` | Router setup, auth init, sidebar layout |
-| HTML Entry | `index.html` | Vite HTML shell |
-| Build Config | `vite.config.ts` | Vite + React plugin + Terser |
-| Deploy Config | `netlify.toml` | Netlify build + SPA redirects |
+| Folder | Role |
+|---|---|
+| `src/` | Entire application (app-at-root after reorg). `@/` alias target. |
+| `src/components/{admin,auth,common,debug,guide,map,zone}` | UI layer — see [component-inventory.md](./component-inventory.md). |
+| `src/services/` | **The only place Supabase is called from** — static service classes. |
+| `src/stores/` | Zustand v5 global state (`authStore`, `mapStore`, `uiStore`). |
+| `schemas/` | Human-reference SQL (numbered, applied via SQL Editor). |
+| `supabase/` | Local Docker stack — **docker commands run here, not at repo root**. |
+| `public/vietnam-map-data/` | Static GADM GeoJSON served via the netlify redirect. |
+| `playwright/` | E2E tests + support factories/fixtures/helpers. |
 
-## Critical Folders
+## Entry points
 
-| Directory | Purpose | Key Files |
-|-----------|---------|-----------|
-| `src/services/` | Backend communication layer | 7 service classes |
-| `src/stores/` | Zustand state management | 3 stores (auth, map, ui) |
-| `src/types/` | TypeScript type definitions | 5 type files |
-| `src/components/map/` | Leaflet map integration | InteractiveMapContainer (primary) |
-| `src/pages/` | Route-level components | 9 pages |
-| `schemas/` | SQL schema definitions | 5 migration files |
-| `public/vietnam-map-data/` | Static GeoJSON data | GADM boundary files |
+1. **`index.html`** — Vite HTML entry (`lang="en"`, title "Vietnam Economic Zones"), mounts `#root`, loads `/src/main.tsx`.
+2. **`src/main.tsx`** — imports `./index.css`, then `./i18n` (i18next init), then `App`; renders `<App/>` in `<StrictMode>`.
+3. **`src/App.tsx`** — `<BrowserRouter>`; calls `initializeAuth()` (from `@/stores/authStore`) on mount; declares the route table; renders `<Sidebar/>` (hidden on `/login`) and `<Notification/>`; calls `useAnalyticsTracking()`.
 
-## Import Alias
+## Two-env-file discipline
 
-- `@/` → `./src/` (configured in both `vite.config.ts` and `tsconfig.app.json`)
+| File | Scope | Loaded by |
+|---|---|---|
+| Root `.env.local` | Vite frontend — `VITE_*` only | Vite automatically |
+| `supabase/.env` | Docker/local-Supabase secrets (`POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`…) | Docker Compose (from `supabase/`) |
+| `playwright/.env` | E2E-only (`TEST_ENV`, test creds, staging/production URLs) | shell/CI |
+
+`supabase/setup-local-supabase.sh` is the bridge: it generates `supabase/.env` **and** writes the matching `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` into the root `.env.local`, so a single setup run wires the app to the local stack. **Do not mix** Docker secrets into `.env.local`.
+
+## Commands (run from repo root, except docker)
+
+| Task | Command |
+|---|---|
+| Dev server | `npm run dev` |
+| Production build | `npm run build` (`tsc -b && vite build`) |
+| Lint | `npm run lint` |
+| Preview build | `npm run preview` |
+| E2E | `npm run test:e2e` (`:ui`, `:debug`, `:headed` variants) |
+| Local Supabase (up/down/reset) | `cd supabase && docker compose up -d` / `down` / `down -v` |
+
+> No `test` (unit) script exists — Vitest is installed but unwired.
+
+---
+
+## Related docs
+
+- [Development Guide](./development-guide.md) — full setup, testing, deployment.
+- [Architecture](./architecture.md) — how the layers fit together.
