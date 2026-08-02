@@ -132,6 +132,7 @@ const QuizManager: React.FC = () => {
           <p className="text-gray-600">{t('admin.quiz.description')}</p>
         </div>
         <button
+          data-testid="create-quiz-button"
           onClick={() => setShowCreateForm(true)}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
         >
@@ -151,6 +152,7 @@ const QuizManager: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.quizTitle')}</label>
               <input
                 type="text"
+                data-testid="new-quiz-title-input"
                 value={newQuiz.title}
                 onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -160,6 +162,7 @@ const QuizManager: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.description')}</label>
               <textarea
+                data-testid="new-quiz-description-input"
                 value={newQuiz.description}
                 onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -170,6 +173,7 @@ const QuizManager: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.difficulty')}</label>
               <select
+                data-testid="new-quiz-difficulty-select"
                 value={newQuiz.difficulty}
                 onChange={(e) => setNewQuiz({ ...newQuiz, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -181,6 +185,7 @@ const QuizManager: React.FC = () => {
             </div>
             <div className="flex gap-3">
               <button
+                data-testid="submit-create-quiz-button"
                 onClick={handleCreateQuiz}
                 disabled={!newQuiz.title || !newQuiz.description}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -188,6 +193,7 @@ const QuizManager: React.FC = () => {
                 {t('admin.quiz.createQuiz')}
               </button>
               <button
+                data-testid="cancel-create-quiz-button"
                 onClick={() => setShowCreateForm(false)}
                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
               >
@@ -215,13 +221,14 @@ const QuizManager: React.FC = () => {
         ) : (
           <div className="divide-y divide-gray-200">
             {quizzes.map((quiz) => (
-            <div key={quiz.id} className="p-6 hover:bg-gray-50 transition-colors">
+            <div key={quiz.id} data-testid={`quiz-row-${quiz.id}`} className="p-6 hover:bg-gray-50 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h4 className="text-lg font-semibold text-gray-900">{quiz.title}</h4>
                     <div className="flex items-center gap-1">
                       <span
+                        data-testid={`quiz-status-${quiz.id}`}
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(quiz.status)} cursor-help`}
                         title={t(`admin.quiz.statusDescriptions.${quiz.status}`)}
                       >
@@ -258,6 +265,7 @@ const QuizManager: React.FC = () => {
                     {t('admin.quiz.takeQuiz')}
                   </button>
                   <button
+                    data-testid={`quiz-edit-button-${quiz.id}`}
                     onClick={() => handleEditQuiz(quiz.id)}
                     className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title={t('admin.quiz.editQuiz')}
@@ -267,6 +275,7 @@ const QuizManager: React.FC = () => {
                     </svg>
                   </button>
                   <button
+                    data-testid={`quiz-delete-button-${quiz.id}`}
                     onClick={() => handleDeleteQuiz(quiz)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title={t('admin.quiz.deleteQuiz')}
@@ -293,6 +302,8 @@ const QuizManager: React.FC = () => {
         confirmText={t('admin.quiz.delete')}
         cancelText={t('admin.quiz.cancel')}
         type="danger"
+        confirmTestId="confirm-delete-button"
+        cancelTestId="cancel-delete-button"
       />
 
       {/* Create Confirmation Modal */}
@@ -305,6 +316,8 @@ const QuizManager: React.FC = () => {
         confirmText={t('admin.quiz.create')}
         cancelText={t('admin.quiz.cancel')}
         type="info"
+        confirmTestId="confirm-create-button"
+        cancelTestId="cancel-create-button"
       />
     </div>
   );

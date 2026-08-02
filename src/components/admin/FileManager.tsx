@@ -268,6 +268,7 @@ const FileManager: React.FC = () => {
 
             {/* Upload Button */}
             <button
+              data-testid="document-upload-button"
               onClick={() => setShowUpload(true)}
               className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 hover:shadow-xl"
             >

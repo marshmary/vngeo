@@ -271,7 +271,7 @@ const QuizEditPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6">
         {/* Draft Prompt Modal */}
         {showDraftPrompt && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div data-testid="draft-prompt" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-6 max-w-md mx-4">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {language === 'vi' ? 'Bản nháp chưa lưu' : 'Unsaved Draft Found'}
@@ -283,12 +283,14 @@ const QuizEditPage: React.FC = () => {
               </p>
               <div className="flex gap-3">
                 <button
+                  data-testid="load-draft-button"
                   onClick={loadDraft}
                   className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   {language === 'vi' ? 'Tải bản nháp' : 'Load Draft'}
                 </button>
                 <button
+                  data-testid="discard-draft-button"
                   onClick={discardDraft}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                 >
@@ -318,6 +320,7 @@ const QuizEditPage: React.FC = () => {
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
               </button>
               <button
+                data-testid="save-quiz-button"
                 onClick={handleSaveQuiz}
                 disabled={isSaving || !quizTitle || questions.length === 0}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -335,6 +338,7 @@ const QuizEditPage: React.FC = () => {
               </label>
               <input
                 type="text"
+                data-testid="quiz-title-input"
                 value={quizTitle}
                 onChange={(e) => {
                   setQuizTitle(e.target.value);
@@ -349,6 +353,7 @@ const QuizEditPage: React.FC = () => {
                 {language === 'vi' ? 'Độ khó' : 'Difficulty'}
               </label>
               <select
+                data-testid="quiz-difficulty-select"
                 value={quizDifficulty}
                 onChange={(e) => {
                   setQuizDifficulty(e.target.value as 'easy' | 'medium' | 'hard');
@@ -366,6 +371,7 @@ const QuizEditPage: React.FC = () => {
                 {language === 'vi' ? 'Trạng thái' : 'Status'}
               </label>
               <select
+                data-testid="quiz-status-select"
                 value={quizStatus}
                 onChange={(e) => {
                   setQuizStatus(e.target.value as 'draft' | 'published' | 'archived');
@@ -383,6 +389,7 @@ const QuizEditPage: React.FC = () => {
                 {language === 'vi' ? 'Mô tả' : 'Description'}
               </label>
               <textarea
+                data-testid="quiz-description-input"
                 value={quizDescription}
                 onChange={(e) => {
                   setQuizDescription(e.target.value);
@@ -419,6 +426,7 @@ const QuizEditPage: React.FC = () => {
               {language === 'vi' ? 'Câu Hỏi' : 'Questions'} ({questions.length})
             </h2>
             <button
+              data-testid="add-question-button"
               onClick={handleAddQuestion}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
             >
@@ -439,7 +447,7 @@ const QuizEditPage: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {questions.map((question, index) => (
-                <div key={question.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
+                <div key={question.id} data-testid={`question-row-${index}`} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
                   {editingQuestionId === question.id ? (
                     // Edit Mode
                     <div className="space-y-4">
@@ -448,6 +456,7 @@ const QuizEditPage: React.FC = () => {
                           {language === 'vi' ? 'Câu hỏi' : 'Question'}
                         </label>
                         <textarea
+                          data-testid={`question-text-input-${index}`}
                           value={currentQuestion}
                           onChange={(e) => setCurrentQuestion(e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -487,18 +496,21 @@ const QuizEditPage: React.FC = () => {
                             <div key={option.id} className="flex items-center gap-2">
                               <input
                                 type={allowMultipleAnswers ? 'checkbox' : 'radio'}
+                                data-testid={`correct-option-radio-${index}-${optIndex}`}
                                 checked={option.isCorrect}
                                 onChange={(e) => handleUpdateOption(optIndex, 'isCorrect', e.target.checked)}
                                 className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                               />
                               <input
                                 type="text"
+                                data-testid={`option-text-input-${index}-${optIndex}`}
                                 value={option.text}
                                 onChange={(e) => handleUpdateOption(optIndex, 'text', e.target.value)}
                                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                 placeholder={`${language === 'vi' ? 'Đáp án' : 'Answer'} ${optIndex + 1}`}
                               />
                               <button
+                                data-testid={`delete-option-button-${index}-${optIndex}`}
                                 onClick={() => handleDeleteOption(optIndex)}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                 disabled={currentOptions.length <= 2}
@@ -510,6 +522,7 @@ const QuizEditPage: React.FC = () => {
                             </div>
                           ))}
                           <button
+                            data-testid={`add-option-button-${index}`}
                             onClick={handleAddOption}
                             className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
                           >
@@ -536,6 +549,7 @@ const QuizEditPage: React.FC = () => {
 
                       <div className="flex gap-2">
                         <button
+                          data-testid={`save-question-button-${index}`}
                           onClick={handleSaveQuestion}
                           disabled={!currentQuestion || currentOptions.length < 2 || !currentOptions.some(opt => opt.isCorrect)}
                           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -543,6 +557,7 @@ const QuizEditPage: React.FC = () => {
                           {language === 'vi' ? 'Lưu' : 'Save'}
                         </button>
                         <button
+                          data-testid={`cancel-question-edit-button-${index}`}
                           onClick={handleCancelEdit}
                           className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                         >
@@ -579,6 +594,7 @@ const QuizEditPage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1 ml-4">
                           <button
+                            data-testid={`move-question-up-button-${index}`}
                             onClick={() => handleMoveQuestion(index, 'up')}
                             disabled={index === 0}
                             className="p-1 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
@@ -589,6 +605,7 @@ const QuizEditPage: React.FC = () => {
                             </svg>
                           </button>
                           <button
+                            data-testid={`move-question-down-button-${index}`}
                             onClick={() => handleMoveQuestion(index, 'down')}
                             disabled={index === questions.length - 1}
                             className="p-1 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
@@ -599,6 +616,7 @@ const QuizEditPage: React.FC = () => {
                             </svg>
                           </button>
                           <button
+                            data-testid={`edit-question-button-${index}`}
                             onClick={() => handleEditQuestion(question)}
                             className="p-1 text-indigo-600 hover:bg-indigo-50 rounded"
                             title={language === 'vi' ? 'Chỉnh sửa' : 'Edit'}
@@ -608,6 +626,7 @@ const QuizEditPage: React.FC = () => {
                             </svg>
                           </button>
                           <button
+                            data-testid={`remove-question-button-${index}`}
                             onClick={() => handleDeleteQuestion(question.id)}
                             className="p-1 text-red-600 hover:bg-red-50 rounded"
                             title={language === 'vi' ? 'Xóa' : 'Delete'}
