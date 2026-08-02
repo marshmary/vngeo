@@ -45,6 +45,7 @@ test.describe('Map Interactions', () => {
     });
 
     test('should show zone details on marker click', async ({ page }) => {
+      test.skip(/mobile/i.test(test.info().project.name), 'zone-details side panel is xl-desktop-only');
       await page.goto('/');
 
       // Wait for map to load

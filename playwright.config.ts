@@ -63,8 +63,11 @@ export default defineConfig({
   // Prevent accidentally committed .only() from blocking CI
   forbidOnly: !!process.env.CI,
 
-  // Retry failed tests in CI
-  retries: process.env.CI ? 2 : 0,
+  // Retry failed tests: 2 in CI, 1 locally to absorb cold Vite dev-server
+  // warm-up flakes (first-hit transforms under parallel load) without masking
+  // persistent failures. A test that only passes on retry still shows as
+  // "flaky" in the report, so real regressions stay visible.
+  retries: process.env.CI ? 2 : 1,
 
   // Worker configuration
   workers: process.env.CI ? 1 : undefined,

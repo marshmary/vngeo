@@ -1,4 +1,5 @@
 import { test, expect } from '../support/fixtures';
+import { setLanguage } from '../support/helpers/auth-helpers';
 
 /**
  * Homepage E2E Tests
@@ -40,6 +41,7 @@ test.describe('Homepage', () => {
   });
 
   test('should navigate to zone details on legend click', async ({ page }) => {
+    test.skip(/mobile/i.test(test.info().project.name), 'zone-details side panel is xl-desktop-only');
     await page.goto('/');
 
     // Wait for map to load
@@ -57,19 +59,15 @@ test.describe('Homepage', () => {
   test('should toggle language between Vietnamese and English', async ({ page }) => {
     await page.goto('/');
 
-    // Click language selector in sidebar
-    await page.click('[data-testid="language-selector"]');
-
-    // Select English (EN)
-    await page.click('[data-testid="language-option-en"]');
+    // setLanguage opens the off-canvas mobile sidebar before the selector.
+    await setLanguage(page, 'en');
 
     // Verify English text is visible (check for common English UI elements)
     // The page title should update to contain English text
     await expect(page.getByText(/Economic Zones/i).first()).toBeVisible();
 
     // Switch back to Vietnamese
-    await page.click('[data-testid="language-selector"]');
-    await page.click('[data-testid="language-option-vi"]');
+    await setLanguage(page, 'vi');
 
     // Verify Vietnamese text is visible
     await expect(page.getByText(/Vùng Kinh Té|Kinh Tế/i).first()).toBeVisible();
@@ -91,6 +89,7 @@ test.describe('Homepage', () => {
   });
 
   test('should close zone details sidebar', async ({ page }) => {
+    test.skip(/mobile/i.test(test.info().project.name), 'zone-details side panel is xl-desktop-only');
     await page.goto('/');
 
     // Click on a zone button to open details
@@ -111,6 +110,7 @@ test.describe('Homepage', () => {
   });
 
   test('should display quick zone list when no zone selected', async ({ page }) => {
+    test.skip(/mobile/i.test(test.info().project.name), 'zone-details side panel is xl-desktop-only');
     await page.goto('/');
 
     // When no zone is selected, the zone details sidebar should show quick zone list

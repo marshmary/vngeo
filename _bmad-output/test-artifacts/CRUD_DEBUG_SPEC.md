@@ -1,6 +1,15 @@
 # CRUD E2E Debug Spec — Write-Path Failures
 
-> **Status:** DRAFT — debugging plan for the CRUD suites committed in `9e9fe3d`.
+> **Status:** ✅ RESOLVED (2026-08-02) — CRUD suite green on chromium: 12 passed / 1 intentionally skipped.
+> Root causes of the remaining red after `be59719`: **cross-project interference** (each
+> browser project's afterAll service-role sweep deleted *all* `[E2E-` rows, and the
+> singleton `general_settings` row was written concurrently by 5 projects). Fix: CRUD
+> runs are now scoped to chromium (`npm run test:e2e:crud` → `--project=chromium`) —
+> write paths are browser-agnostic and cross-browser coverage stays in the read suite.
+> The two mobile-only overlay findings (upload modal cut off / save button covered on
+> small viewports) are **app responsive bugs** to fix in the app, not the suite.
+
+> **Original status:** DRAFT — debugging plan for the CRUD suites committed in `9e9fe3d`.
 > The CRUD **read/foundation** is solid; the **write-paths** are red against local
 > Supabase. This spec routes each failure to a root cause and classifies it as
 > **test-fix** (fix in-suite) or **app-bug/DB-config** (raise, mark `test.fixme`).

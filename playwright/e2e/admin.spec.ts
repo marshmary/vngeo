@@ -1,5 +1,6 @@
 import { test, expect } from '../support/fixtures';
 import { loginAdmin, logoutUser } from '../support/helpers/auth-helpers';
+import { openMobileSidebarIfNeeded } from '../support/helpers/sidebar-helpers';
 import { createAdminUser } from '../support/factories/user-factory';
 
 /**
@@ -46,7 +47,8 @@ test.describe('Admin Dashboard', () => {
 
       await loginAdmin(page, admin);
 
-      // Open user menu
+      // Open user menu (it lives in the sidebar — off-canvas on mobile)
+      await openMobileSidebarIfNeeded(page);
       await page.click('[data-testid="user-menu-button"]');
 
       // Should see admin dashboard link

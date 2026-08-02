@@ -1,5 +1,6 @@
 import { test, expect } from '../support/fixtures';
 import { loginAdmin, logoutUser } from '../support/helpers/auth-helpers';
+import { openMobileSidebarIfNeeded } from '../support/helpers/sidebar-helpers';
 import { createAdminUser } from '../support/factories/user-factory';
 
 /**
@@ -137,6 +138,8 @@ test.describe('Quiz Edit Page', () => {
       await page.goto('/admin/quiz/sample-quiz/edit');
       await page.waitForTimeout(500);
 
+      // The language selector lives in the sidebar, which is off-canvas on mobile.
+      await openMobileSidebarIfNeeded(page);
       // Language selector should be accessible
       const languageSelector = page.getByTestId('language-selector');
       if (await languageSelector.count() > 0) {

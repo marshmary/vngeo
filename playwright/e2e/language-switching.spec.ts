@@ -1,5 +1,6 @@
 import { test, expect } from '../support/fixtures';
 import { setLanguage } from '../support/helpers/auth-helpers';
+import { openMobileSidebarIfNeeded } from '../support/helpers/sidebar-helpers';
 
 /**
  * Language Switching E2E Tests
@@ -115,7 +116,8 @@ test.describe('Language Switching', () => {
     test('should show Vietnamese and English options', async ({ page }) => {
       await page.goto('/');
 
-      // Click language selector to open dropdown
+      // The language selector lives in the sidebar, which is off-canvas on mobile.
+      await openMobileSidebarIfNeeded(page);
       await page.click('[data-testid="language-selector"]');
 
       // Should show both language options

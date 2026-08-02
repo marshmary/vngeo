@@ -65,6 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
     <>
       {/* Mobile Menu Button */}
       <button
+        data-testid="mobile-menu-button"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="fixed top-4 left-4 z-[5000] lg:hidden bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow"
       >
