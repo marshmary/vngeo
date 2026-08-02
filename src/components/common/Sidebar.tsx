@@ -65,6 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
     <>
       {/* Mobile Menu Button */}
       <button
+        data-testid="mobile-menu-button"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="fixed top-4 left-4 z-[5000] lg:hidden bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow"
       >
@@ -81,6 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
 
       {/* Sidebar */}
       <aside
+        data-testid="navbar"
         className={`
           fixed top-0 left-0 h-screen bg-white shadow-xl z-[4500]
           transition-all duration-300 ease-in-out
@@ -210,6 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
             {/* Language Dropdown */}
             <div className="relative mb-4" ref={languageDropdownRef}>
               <button
+                data-testid="language-selector"
                 data-guide="sidebar-language"
                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                 className={`w-full flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all ${
@@ -238,6 +241,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
+                      data-testid={`language-option-${lang.code}`}
                       onClick={() => {
                         useUIStore.getState().setLanguage(lang.code);
                         setShowLanguageDropdown(false);
@@ -264,7 +268,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
             </div>
 
             {/* User Profile */}
-            <div data-guide="sidebar-profile" className={isCollapsed ? 'flex justify-center' : ''}>
+            <div data-testid="user-profile-section" data-guide="sidebar-profile" className={isCollapsed ? 'flex justify-center' : ''}>
               <UserProfileDropdown isCollapsed={isCollapsed} />
             </div>
           </div>

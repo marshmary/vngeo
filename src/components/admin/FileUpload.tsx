@@ -188,6 +188,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload, onCreateFolder, onClo
               >
                 <input
                   ref={inputRef}
+                  data-testid="document-upload-input"
                   type="file"
                   multiple
                   onChange={handleChange}
@@ -320,6 +321,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload, onCreateFolder, onClo
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
           <button
+            data-testid="document-upload-cancel"
             onClick={onClose}
             disabled={isUploading}
             className={`px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-colors ${
@@ -329,6 +331,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload, onCreateFolder, onClo
             Cancel
           </button>
           <button
+            data-testid="document-upload-submit"
             onClick={handleSubmit}
             disabled={
               isUploading ||

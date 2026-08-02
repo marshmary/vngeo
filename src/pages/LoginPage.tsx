@@ -80,6 +80,7 @@ const LoginPage: React.FC = () => {
                 </label>
                 <input
                   id="email"
+                  data-testid="email-input"
                   type="email"
                   {...register('email', {
                     required: 'Email is required',
@@ -92,7 +93,7 @@ const LoginPage: React.FC = () => {
                   placeholder="Enter your email"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                  <p data-testid="email-error" className="mt-1 text-sm text-red-500">{errors.email.message}</p>
                 )}
               </div>
 
@@ -106,6 +107,7 @@ const LoginPage: React.FC = () => {
                 </label>
                 <input
                   id="password"
+                  data-testid="password-input"
                   type="password"
                   {...register('password', {
                     required: 'Password is required',
@@ -118,7 +120,7 @@ const LoginPage: React.FC = () => {
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                  <p data-testid="password-error" className="mt-1 text-sm text-red-500">{errors.password.message}</p>
                 )}
               </div>
 
@@ -128,6 +130,7 @@ const LoginPage: React.FC = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                  data-testid="login-error"
                 >
                   <p className="text-sm text-red-600">{error}</p>
                 </motion.div>
@@ -138,6 +141,7 @@ const LoginPage: React.FC = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
+                data-testid="login-button"
                 disabled={isLoading}
                 className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >

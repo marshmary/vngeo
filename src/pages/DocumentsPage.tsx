@@ -73,7 +73,7 @@ const DocumentsPage: React.FC = () => {
   }, [selectedFolder]);
 
   return (
-    <div className="main-container scrollable">
+    <div data-testid="documents-page" className="main-container scrollable">
       {/* Main Content */}
       <main className="p-8">
         <div className="max-w-6xl mx-auto">
@@ -199,7 +199,7 @@ const DocumentsPage: React.FC = () => {
                   const fileSize = DocumentsPageService.formatFileSize(document.size);
 
                   return (
-                    <div key={document.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100">
+                    <div key={document.id} data-testid="document-card" data-document-id={document.id} className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100">
                       {/* Document Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">

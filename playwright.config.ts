@@ -1,5 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load E2E test env (TEST_ENV, TEST_USER_EMAIL, TEST_ADMIN_EMAIL, ...) from
+// playwright/.env into process.env. Kept separate from the app's Vite .env.local.
+// Test workers are forked after the config loads, so they inherit these values.
+dotenv.config({ path: path.resolve(__dirname, './playwright/.env') });
 
 /**
  * Playwright Configuration for Vietnam Economic Zones E2E Tests
@@ -51,8 +63,11 @@ export default defineConfig({
   // Prevent accidentally committed .only() from blocking CI
   forbidOnly: !!process.env.CI,
 
-  // Retry failed tests in CI
-  retries: process.env.CI ? 2 : 0,
+  // Retry failed tests: 2 in CI, 1 locally to absorb cold Vite dev-server
+  // warm-up flakes (first-hit transforms under parallel load) without masking
+  // persistent failures. A test that only passes on retry still shows as
+  // "flaky" in the report, so real regressions stay visible.
+  retries: process.env.CI ? 2 : 1,
 
   // Worker configuration
   workers: process.env.CI ? 1 : undefined,

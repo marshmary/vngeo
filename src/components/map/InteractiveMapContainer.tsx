@@ -400,7 +400,7 @@ const InteractiveMapContainer: React.FC = () => {
   }
 
   return (
-    <div data-guide="map-container" className="relative h-full w-full overflow-hidden">
+    <div data-testid="interactive-map" data-guide="map-container" className="relative h-full w-full overflow-hidden">
       <MapContainer
         center={mapCenter}
         zoom={zoomLevel}
@@ -440,7 +440,7 @@ const InteractiveMapContainer: React.FC = () => {
       <ZoneTooltip zone={hoveredZone} mousePosition={mousePosition} />
 
       {/* Economic Zone Legend */}
-      <div data-guide="map-legend" className="legend-container">
+      <div data-testid="map-legend" data-guide="map-legend" className="legend-container">
         <div className="mb-3">
           <h4 className="font-semibold text-sm text-gray-900">
             {language === 'vi' ? 'VÙNG KINH TẾ' : 'ECONOMIC ZONES'}
@@ -451,6 +451,7 @@ const InteractiveMapContainer: React.FC = () => {
           {Object.entries(ZONE_METADATA).map(([zoneId, metadata]) => (
             <button
               key={zoneId}
+              data-testid={`zone-button-${zoneId}`}
               onClick={() => handleLegendClick(zoneId)}
               className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200 hover:bg-gray-50 ${
                 selectedZone === zoneId ? 'bg-blue-50 border border-blue-200' : ''

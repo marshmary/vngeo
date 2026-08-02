@@ -55,7 +55,7 @@ const QuizListPage: React.FC = () => {
   }, [filterDifficulty]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div data-testid="quiz-list-page" className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-8">
@@ -110,6 +110,8 @@ const QuizListPage: React.FC = () => {
               {paginatedQuizzes.map((quiz) => (
                 <div
                   key={quiz.id}
+                  data-testid="quiz-card"
+                  data-quiz-id={quiz.id}
                   className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer"
                   onClick={() => navigate(`/quiz/${quiz.id}`)}
                 >

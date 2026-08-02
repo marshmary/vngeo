@@ -27,6 +27,8 @@ build/
 _bmad/
 .serena/
 .zcode/
+.opencode/
+.agents/
 *.swp
 *.swo
 *~
@@ -56,6 +58,15 @@ coverage/
 
 # nyc test coverage
 .nyc_output
+
+# Playwright e2e
+# Generated HTML/JUnit reports and per-run artifacts (traces, screenshots, videos)
+playwright-report/
+test-results/
+**/playwright/.cache/
+# Persisted auth/session state — holds tokens & cookies. NEVER commit.
+**/playwright/.auth/
+**/playwright/auth-sessions/
 
 # Dependency directories
 jspm_packages/

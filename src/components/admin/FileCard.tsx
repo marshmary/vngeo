@@ -67,6 +67,8 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
   if (viewMode === 'list') {
     return (
       <div
+        data-testid="file-card"
+        data-file-id={file.id}
         onClick={onFolderClick}
         className={`flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-all group ${
           onFolderClick ? 'cursor-pointer' : ''
@@ -96,6 +98,7 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
         {/* Actions */}
         <div className="relative">
           <button
+            data-testid={`file-menu-button-${file.id}`}
             onClick={() => setShowMenu(!showMenu)}
             className="p-2 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
           >
@@ -107,6 +110,7 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
           {showMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 z-10">
               <button
+                data-testid={`document-delete-button-${file.id}`}
                 onClick={() => {
                   onDelete(file.id);
                   setShowMenu(false);
@@ -124,6 +128,8 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
 
   return (
     <div
+      data-testid="file-card"
+      data-file-id={file.id}
       onClick={onFolderClick}
       className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 hover:shadow-lg transition-all group relative border border-gray-100 ${
         onFolderClick ? 'cursor-pointer' : ''
@@ -131,6 +137,7 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
     >
       {/* Menu Button */}
       <button
+        data-testid={`file-menu-button-${file.id}`}
         onClick={(e) => {
           e.stopPropagation();
           setShowMenu(!showMenu);
@@ -146,6 +153,7 @@ const FileCard: React.FC<FileCardProps> = ({ file, viewMode, onDelete, onFolderC
       {showMenu && (
         <div className="absolute top-14 right-4 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 z-10">
           <button
+            data-testid={`document-delete-button-${file.id}`}
             onClick={() => {
               onDelete(file.id);
               setShowMenu(false);

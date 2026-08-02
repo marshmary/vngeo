@@ -12,7 +12,7 @@ const SpratlyIslandsLabel: React.FC = () => {
   // Create a custom icon for the text label
   const textIcon = L.divIcon({
     html: `
-      <div style="
+      <div data-testid="spratly-islands-label" style="
         background: transparent;
         border: none;
         padding: 4px 8px;
