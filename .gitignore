@@ -27,6 +27,8 @@ build/
 _bmad/
 .serena/
 .zcode/
+.opencode/
+.agents/
 *.swp
 *.swo
 *~
