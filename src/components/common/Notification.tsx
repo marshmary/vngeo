@@ -20,14 +20,14 @@ const Notification: React.FC = () => {
   const getNotificationStyles = (type: string) => {
     switch (type) {
       case 'success':
-        return 'bg-green-500 text-white';
+        return 'bg-success text-white';
       case 'error':
-        return 'bg-red-500 text-white';
+        return 'bg-danger text-white';
       case 'warning':
-        return 'bg-yellow-500 text-white';
+        return 'bg-warning text-white';
       case 'info':
       default:
-        return 'bg-blue-500 text-white';
+        return 'bg-info text-white';
     }
   };
 

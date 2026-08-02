@@ -45,13 +45,13 @@ const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h4 className="font-semibold text-gray-800 text-sm">
+          <h4 className="font-semibold text-foreground text-sm">
             {zone.name}
           </h4>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {zone.nameVi}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {zone.region}
           </p>
         </div>
@@ -62,7 +62,7 @@ const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
         ></div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600">
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
         <div>
           <span className="font-medium">Population:</span>
           <br />
@@ -80,13 +80,13 @@ const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
           {zone.industries.slice(0, 2).map((industry) => (
             <span
               key={industry}
-              className="px-2 py-1 bg-gray-100 text-xs rounded text-gray-700"
+              className="px-2 py-1 bg-muted text-xs rounded text-foreground"
             >
               {t(`industries.${industry}`)}
             </span>
           ))}
           {zone.industries.length > 2 && (
-            <span className="px-2 py-1 bg-gray-100 text-xs rounded text-gray-500">
+            <span className="px-2 py-1 bg-muted text-xs rounded text-muted-foreground">
               +{zone.industries.length - 2} more
             </span>
           )}
@@ -97,9 +97,9 @@ const ZoneCard: React.FC<ZoneCardProps> = ({ zone, className = '' }) => {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mt-3 pt-3 border-t border-gray-200"
+          className="mt-3 pt-3 border-t border-border"
         >
-          <p className="text-xs text-blue-600 font-medium">
+          <p className="text-xs text-info font-medium">
             Click on map marker for more details →
           </p>
         </motion.div>

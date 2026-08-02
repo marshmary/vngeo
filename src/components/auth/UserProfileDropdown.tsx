@@ -56,7 +56,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
       <button
         data-testid="login-button-sidebar"
         onClick={() => navigate('/login')}
-        className={`bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center ${
+        className={`bg-gradient-to-r from-accent-from to-accent-to text-white font-medium text-sm rounded-button hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg flex items-center ${
           isCollapsed ? 'justify-center w-10 h-10' : 'gap-2 px-4 py-2 w-full'
         }`}
         title={language === 'vi' ? 'Đăng nhập' : 'Login'}
@@ -87,14 +87,14 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
             <Menu.Button
               ref={buttonRef}
               data-testid="user-menu-button"
-              className={`flex items-center focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg p-1 ${isCollapsed ? 'justify-center' : 'space-x-2'}`}
+              className={`flex items-center focus:outline-none focus:ring-2 focus:ring-brand rounded-button p-1 ${isCollapsed ? 'justify-center' : 'space-x-2'}`}
             >
               {/* User Avatar */}
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow">
+              <div className="w-9 h-9 bg-gradient-to-br from-accent-from to-accent-to rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow">
                 {userInitial}
               </div>
               {/* Dropdown Icon */}
-              {!isCollapsed && <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4 text-gray-600" />}
+              {!isCollapsed && <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4 text-muted-foreground" />}
             </Menu.Button>
 
             {/* Render dropdown menu in a portal to escape sidebar container */}
@@ -109,22 +109,22 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
                 leaveTo="transform opacity-0 scale-95"
               >
                 <Menu.Items
-                  className="absolute w-56 origin-bottom-right bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-[6000]"
+                  className="absolute w-56 origin-bottom-right bg-card rounded-card shadow-overlay ring-1 ring-black ring-opacity-5 focus:outline-none z-[6000]"
                   style={{
                     bottom: `${window.innerHeight - menuPosition.top}px`,
                     left: `${menuPosition.left}px`
                   }}
                 >
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-border">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 bg-gradient-to-br from-accent-from to-accent-to rounded-full flex items-center justify-center text-white font-semibold">
                 {userInitial}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-semibold text-foreground truncate">
                   {displayName}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
             </div>
           </div>
@@ -137,13 +137,13 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
                     data-testid="admin-dashboard-link"
                     onClick={() => navigate('/admin')}
                     className={`${
-                      active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700'
-                    } group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors`}
+                      active ? 'bg-brand-subtle text-brand' : 'text-foreground'
+                    } group flex w-full items-center rounded-button px-3 py-2 text-sm font-medium transition-colors`}
                   >
                     <FontAwesomeIcon
                       icon={faGear}
                       className={`${
-                        active ? 'text-indigo-600' : 'text-gray-500'
+                        active ? 'text-brand' : 'text-muted-foreground'
                       } mr-3 h-5 w-5`}
                     />
                     Admin Dashboard
@@ -157,13 +157,13 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ isCollapsed =
                   data-testid="logout-button"
                   onClick={handleSignOut}
                   className={`${
-                    active ? 'bg-red-50 text-red-700' : 'text-gray-700'
-                  } group flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors`}
+                    active ? 'bg-danger-soft text-danger-strong' : 'text-foreground'
+                  } group flex w-full items-center rounded-button px-3 py-2 text-sm font-medium transition-colors`}
                 >
                   <FontAwesomeIcon
                     icon={faRightFromBracket}
                     className={`${
-                      active ? 'text-red-600' : 'text-gray-500'
+                      active ? 'text-danger' : 'text-muted-foreground'
                     } mr-3 h-5 w-5`}
                   />
                   Logout

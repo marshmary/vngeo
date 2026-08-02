@@ -269,20 +269,20 @@ const FirstTimeGuide: React.FC = () => {
 
       {/* Guide card */}
       <div
-        className={`fixed z-[10000] bg-white rounded-xl shadow-2xl max-w-md w-full transition-all ${
+        className={`fixed z-[10000] bg-card rounded-card shadow-overlay max-w-md w-full transition-all ${
           isCenter ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' : ''
         }`}
         style={adjustedPosition}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-t-xl">
+        <div className="bg-gradient-to-r from-accent-from to-accent-to text-white p-6 rounded-t-card">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold opacity-90">
               {language === 'vi' ? 'Hướng dẫn' : 'Tutorial'} {currentStep + 1}/{GUIDE_STEPS.length}
             </span>
             <button
               onClick={handleSkip}
-              className="text-white hover:text-gray-200 text-sm font-medium"
+              className="text-white hover:text-white/80 text-sm font-medium"
             >
               {language === 'vi' ? 'Bỏ qua' : 'Skip'}
             </button>
@@ -294,7 +294,7 @@ const FirstTimeGuide: React.FC = () => {
 
         {/* Body */}
         <div className="p-6">
-          <p className="text-gray-700 leading-relaxed">
+          <p className="text-foreground leading-relaxed">
             {language === 'vi' ? step.descriptionVi : step.description}
           </p>
         </div>
@@ -304,7 +304,7 @@ const FirstTimeGuide: React.FC = () => {
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed font-medium"
+            className="px-4 py-2 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed font-medium"
           >
             {language === 'vi' ? 'Quay lại' : 'Previous'}
           </button>
@@ -315,10 +315,10 @@ const FirstTimeGuide: React.FC = () => {
                 key={index}
                 className={`h-2 w-2 rounded-full transition-all ${
                   index === currentStep
-                    ? 'bg-indigo-600 w-4'
+                    ? 'bg-brand w-4'
                     : index < currentStep
-                    ? 'bg-indigo-300'
-                    : 'bg-gray-300'
+                    ? 'bg-brand/40'
+                    : 'bg-faint-foreground'
                 }`}
               />
             ))}
@@ -326,7 +326,7 @@ const FirstTimeGuide: React.FC = () => {
 
           <button
             onClick={handleNext}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+            className="px-6 py-2 bg-brand text-white rounded-button hover:bg-brand-hover transition-colors font-medium"
           >
             {currentStep === GUIDE_STEPS.length - 1
               ? language === 'vi'

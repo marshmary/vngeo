@@ -26,22 +26,22 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <div data-testid="admin-dashboard" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div data-testid="admin-dashboard" className="min-h-screen bg-muted">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('admin.dashboard')}</h1>
-          <p className="text-gray-600">{t('admin.manageFiles')}</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('admin.dashboard')}</h1>
+          <p className="text-muted-foreground">{t('admin.manageFiles')}</p>
         </div>
 
         {/* Tab Navigation */}
         <div className="bg-white rounded-2xl shadow-sm mb-6 p-2 inline-flex gap-2">
           <button
             onClick={() => handleTabChange('analytics')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+            className={`px-6 py-3 rounded-button font-medium transition-all ${
               activeTab === 'analytics'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-gray-600 hover:bg-gray-50'
+                : 'text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -63,10 +63,10 @@ const AdminPage: React.FC = () => {
           </button>
           <button
             onClick={() => handleTabChange('settings')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+            className={`px-6 py-3 rounded-button font-medium transition-all ${
               activeTab === 'settings'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-gray-600 hover:bg-gray-50'
+                : 'text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -94,10 +94,10 @@ const AdminPage: React.FC = () => {
           </button>
           <button
             onClick={() => handleTabChange('files')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+            className={`px-6 py-3 rounded-button font-medium transition-all ${
               activeTab === 'files'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-gray-600 hover:bg-gray-50'
+                : 'text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -119,10 +119,10 @@ const AdminPage: React.FC = () => {
           </button>
           <button
             onClick={() => handleTabChange('quiz')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+            className={`px-6 py-3 rounded-button font-medium transition-all ${
               activeTab === 'quiz'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-gray-600 hover:bg-gray-50'
+                : 'text-muted-foreground hover:bg-muted'
             }`}
           >
             <div className="flex items-center gap-2">

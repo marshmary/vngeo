@@ -4,6 +4,7 @@ import { QuizService } from '@/services/quizService';
 import type { Quiz } from '@/types/quiz.types';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
+import { Button, Spinner } from '@/components/ui';
 
 const QuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
@@ -130,10 +131,10 @@ const QuizPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{language === 'vi' ? 'Đang tải...' : 'Loading quiz...'}</p>
+          <Spinner className="h-12 w-12 mx-auto mb-4" />
+          <p className="text-muted-foreground">{language === 'vi' ? 'Đang tải...' : 'Loading quiz...'}</p>
         </div>
       </div>
     );
@@ -141,21 +142,18 @@ const QuizPage: React.FC = () => {
 
   if (error || !quiz) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center bg-white rounded-2xl shadow-sm p-8 max-w-md mx-4">
-          <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
+        <div className="text-center bg-card rounded-card shadow-card border border-border p-8 max-w-md mx-4">
+          <svg className="w-16 h-16 text-danger mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl font-bold text-foreground mb-2">
             {language === 'vi' ? 'Lỗi' : 'Error'}
           </h2>
-          <p className="text-gray-600 mb-6">{error || (language === 'vi' ? 'Không thể tải bài kiểm tra' : 'Failed to load quiz')}</p>
-          <button
-            onClick={() => navigate('/quizzes')}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
+          <p className="text-muted-foreground mb-6">{error || (language === 'vi' ? 'Không thể tải bài kiểm tra' : 'Failed to load quiz')}</p>
+          <Button variant="primary" onClick={() => navigate('/quizzes')}>
             {language === 'vi' ? 'Quay lại danh sách' : 'Back to Quiz List'}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -166,15 +164,15 @@ const QuizPage: React.FC = () => {
     const isPassing = percentage >= 70;
 
     return (
-      <div data-testid="quiz-results" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div data-testid="quiz-results" className="min-h-screen bg-muted">
         <div className="container mx-auto px-6 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Summary Card */}
-            <div className="bg-white rounded-2xl shadow-sm p-8 text-center mb-6">
+            <div className="bg-card rounded-card shadow-card border border-border p-8 text-center mb-6">
               <div className={`w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center ${
-                isPassing ? 'bg-green-100' : 'bg-red-100'
+                isPassing ? 'bg-success-soft' : 'bg-danger-soft'
               }`}>
-                <svg className={`w-12 h-12 ${isPassing ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-12 h-12 ${isPassing ? 'text-success' : 'text-danger'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isPassing ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   ) : (
@@ -183,57 +181,55 @@ const QuizPage: React.FC = () => {
                 </svg>
               </div>
 
-              <h1 className={`text-3xl font-bold mb-4 ${isPassing ? 'text-green-600' : 'text-red-600'}`}>
+              <h1 className={`text-3xl font-bold mb-4 ${isPassing ? 'text-success' : 'text-danger'}`}>
                 {isPassing
                   ? (language === 'vi' ? 'Chúc mừng!' : 'Congratulations!')
                   : (language === 'vi' ? 'Tiếp tục học hỏi!' : 'Keep Learning!')}
               </h1>
 
-              <p className="text-xl text-gray-600 mb-6">
+              <p className="text-xl text-muted-foreground mb-6">
                 {language === 'vi'
                   ? `Bạn trả lời đúng ${score} / ${quiz.questions.length} câu hỏi (${percentage}%)`
                   : `You scored ${score} out of ${quiz.questions.length} questions (${percentage}%)`}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">{score}</div>
-                  <div className="text-sm text-gray-600">{language === 'vi' ? 'Đúng' : 'Correct'}</div>
+                <div className="bg-success-soft rounded-lg p-4">
+                  <div className="text-2xl font-bold text-success-strong">{score}</div>
+                  <div className="text-sm text-muted-foreground">{language === 'vi' ? 'Đúng' : 'Correct'}</div>
                 </div>
-                <div className="bg-red-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-red-600">{quiz.questions.length - score}</div>
-                  <div className="text-sm text-gray-600">{language === 'vi' ? 'Sai' : 'Incorrect'}</div>
+                <div className="bg-danger-soft rounded-lg p-4">
+                  <div className="text-2xl font-bold text-danger-strong">{quiz.questions.length - score}</div>
+                  <div className="text-sm text-muted-foreground">{language === 'vi' ? 'Sai' : 'Incorrect'}</div>
                 </div>
-                <div data-testid="score-display" className="bg-indigo-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-indigo-600">{percentage}%</div>
-                  <div className="text-sm text-gray-600">{language === 'vi' ? 'Điểm số' : 'Score'}</div>
+                <div data-testid="score-display" className="bg-brand-subtle rounded-lg p-4">
+                  <div className="text-2xl font-bold text-brand">{percentage}%</div>
+                  <div className="text-sm text-muted-foreground">{language === 'vi' ? 'Điểm số' : 'Score'}</div>
                 </div>
               </div>
 
               <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => navigate('/quizzes')}
-                  className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-                >
+                <Button variant="primary" size="lg" onClick={() => navigate('/quizzes')}>
                   {language === 'vi' ? 'Quay lại danh sách' : 'Back to Quizzes'}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
                   onClick={() => {
                     setShowResults(false);
                     setCurrentQuestionIndex(0);
                     setSelectedAnswers({});
                     setTimeLeft(quiz.timeLimit ? quiz.timeLimit * 60 : null);
                   }}
-                  className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   {language === 'vi' ? 'Làm lại' : 'Retake Quiz'}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Detailed Results */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-card rounded-card shadow-card border border-border p-8">
+              <h2 className="text-2xl font-bold text-foreground mb-6">
                 {language === 'vi' ? 'Chi tiết kết quả' : 'Detailed Results'}
               </h2>
 
@@ -251,13 +247,13 @@ const QuizPage: React.FC = () => {
                     <div
                       key={question.id}
                       className={`border-2 rounded-lg p-6 ${
-                        isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                        isCorrect ? 'border-success bg-success-soft' : 'border-danger bg-danger-soft'
                       }`}
                     >
                       {/* Question Header */}
                       <div className="flex items-start gap-3 mb-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isCorrect ? 'bg-green-500' : 'bg-red-500'
+                          isCorrect ? 'bg-success' : 'bg-danger'
                         }`}>
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isCorrect ? (
@@ -268,11 +264,11 @@ const QuizPage: React.FC = () => {
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">
+                          <h3 className="font-semibold text-foreground mb-2">
                             {language === 'vi' ? 'Câu' : 'Question'} {qIndex + 1}: {question.question}
                           </h3>
                           {question.allowMultipleAnswers && (
-                            <p className="text-sm text-gray-600 mb-2">
+                            <p className="text-sm text-muted-foreground mb-2">
                               {language === 'vi' ? '(Nhiều đáp án đúng)' : '(Multiple correct answers)'}
                             </p>
                           )}
@@ -285,11 +281,11 @@ const QuizPage: React.FC = () => {
                           const isUserAnswer = userAnswers.includes(option.id);
                           const isCorrectOption = option.isCorrect;
 
-                          let optionStyle = 'bg-white border-gray-200';
+                          let optionStyle = 'bg-card border-border';
                           if (isCorrectOption) {
-                            optionStyle = 'bg-green-100 border-green-400';
+                            optionStyle = 'bg-success-soft border-success';
                           } else if (isUserAnswer && !isCorrectOption) {
-                            optionStyle = 'bg-red-100 border-red-400';
+                            optionStyle = 'bg-danger-soft border-danger';
                           }
 
                           return (
@@ -298,20 +294,20 @@ const QuizPage: React.FC = () => {
                               className={`flex items-center gap-3 p-3 rounded-lg border-2 ${optionStyle}`}
                             >
                               {isCorrectOption && (
-                                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                               )}
                               {isUserAnswer && !isCorrectOption && (
-                                <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5 text-danger flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                               )}
-                              <span className={`flex-1 ${isCorrectOption ? 'font-medium text-green-900' : 'text-gray-700'}`}>
+                              <span className={`flex-1 ${isCorrectOption ? 'font-medium text-success-strong' : 'text-foreground'}`}>
                                 {option.text}
                               </span>
                               {isUserAnswer && (
-                                <span className="text-xs font-medium text-gray-600">
+                                <span className="text-xs font-medium text-muted-foreground">
                                   {language === 'vi' ? 'Bạn chọn' : 'Your answer'}
                                 </span>
                               )}
@@ -322,11 +318,11 @@ const QuizPage: React.FC = () => {
 
                       {/* Explanation */}
                       {question.explanation && (
-                        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-                          <p className="text-sm font-medium text-blue-900 mb-1">
+                        <div className="bg-info-soft border-l-4 border-info p-4 rounded">
+                          <p className="text-sm font-medium text-info-strong mb-1">
                             {language === 'vi' ? 'Giải thích:' : 'Explanation:'}
                           </p>
-                          <p className="text-sm text-blue-800">{question.explanation}</p>
+                          <p className="text-sm text-info-strong">{question.explanation}</p>
                         </div>
                       )}
                     </div>
@@ -344,45 +340,45 @@ const QuizPage: React.FC = () => {
   const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
   return (
-    <div data-testid="quiz-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div data-testid="quiz-page" className="min-h-screen bg-muted">
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <div className="bg-card rounded-card shadow-card border border-border p-6 mb-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{quiz.title}</h1>
-                <p className="text-gray-600">{quiz.description}</p>
+                <h1 className="text-2xl font-bold text-foreground mb-2">{quiz.title}</h1>
+                <p className="text-muted-foreground">{quiz.description}</p>
               </div>
               {timeLeft !== null && (
-                <div className="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-semibold">
+                <div className="bg-danger-soft text-danger px-4 py-2 rounded-lg font-semibold">
                   {formatTime(timeLeft)}
                 </div>
               )}
             </div>
-            
+
             {/* Progress Bar */}
-            <div data-testid="quiz-progress" className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+            <div data-testid="quiz-progress" className="w-full bg-muted rounded-full h-2">
+              <div
+                className="bg-brand h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <div className="flex justify-between text-sm text-gray-600 mt-2">
+            <div className="flex justify-between text-sm text-muted-foreground mt-2">
               <span data-testid="current-question-index">Question {currentQuestionIndex + 1} of {quiz.questions.length}</span>
               <span>{Math.round(progress)}% Complete</span>
             </div>
           </div>
 
           {/* Question */}
-          <div data-testid="quiz-question" className="bg-white rounded-2xl shadow-sm p-8 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <div data-testid="quiz-question" className="bg-card rounded-card shadow-card border border-border p-8 mb-6">
+            <h2 className="text-xl font-semibold text-foreground mb-6">
               {currentQuestion.question}
             </h2>
-            
+
             <div className="space-y-3">
               {currentQuestion.allowMultipleAnswers && (
-                <p className="text-sm text-indigo-600 font-medium mb-4">
+                <p className="text-sm text-brand font-medium mb-4">
                   {language === 'vi' ? '📌 Có thể chọn nhiều đáp án' : '📌 Multiple answers allowed'}
                 </p>
               )}
@@ -397,8 +393,8 @@ const QuizPage: React.FC = () => {
                     data-option-id={option.id}
                     className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'selected border-brand bg-brand-subtle'
+                        : 'border-border hover:border-brand-ring hover:bg-muted'
                     }`}
                   >
                     <input
@@ -411,8 +407,8 @@ const QuizPage: React.FC = () => {
                     />
                     <div className={`w-5 h-5 ${currentQuestion.allowMultipleAnswers ? 'rounded' : 'rounded-full'} border-2 mr-4 flex items-center justify-center ${
                       isSelected
-                        ? 'border-indigo-500 bg-indigo-500'
-                        : 'border-gray-300'
+                        ? 'border-brand bg-brand'
+                        : 'border-border'
                     }`}>
                       {isSelected && (
                         currentQuestion.allowMultipleAnswers ? (
@@ -424,7 +420,7 @@ const QuizPage: React.FC = () => {
                         )
                       )}
                     </div>
-                    <span className="text-gray-900">{option.text}</span>
+                    <span className="text-foreground">{option.text}</span>
                   </label>
                 );
               })}
@@ -433,32 +429,34 @@ const QuizPage: React.FC = () => {
 
           {/* Navigation */}
           <div className="flex justify-between">
-            <button
+            <Button
+              variant="secondary"
+              size="lg"
               data-testid="previous-question-button"
               onClick={handlePreviousQuestion}
               disabled={currentQuestionIndex === 0}
-              className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Previous
-            </button>
-            
+            </Button>
+
             <div className="flex gap-3">
               {currentQuestionIndex === quiz.questions.length - 1 ? (
                 <button
                   data-testid="submit-quiz-button"
                   onClick={handleSubmitQuiz}
-                  className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  className="px-8 py-3 bg-success text-white rounded-button hover:opacity-90 transition-colors font-semibold"
                 >
                   Submit Quiz
                 </button>
               ) : (
-                <button
+                <Button
+                  variant="primary"
+                  size="lg"
                   data-testid="next-question-button"
                   onClick={handleNextQuestion}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   Next
-                </button>
+                </Button>
               )}
             </div>
           </div>

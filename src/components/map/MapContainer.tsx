@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useMapStore } from '@/stores/mapStore';
 import ZoneLayer from './ZoneLayer';
 import ProvinceDebugger from '../debug/ProvinceDebugger';
+import { Button } from '@/components/ui';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -56,10 +57,10 @@ const VietnamMap: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-96 w-full bg-gray-100 flex items-center justify-center">
+      <div className="h-96 w-full bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading Vietnam map...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">Loading Vietnam map...</p>
         </div>
       </div>
     );
@@ -67,23 +68,20 @@ const VietnamMap: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-96 w-full bg-red-50 border border-red-200 flex items-center justify-center">
-        <div className="text-center text-red-600">
+      <div className="h-96 w-full bg-danger-soft border border-danger/30 flex items-center justify-center">
+        <div className="text-center text-danger">
           <p className="font-semibold">Error loading map</p>
           <p className="text-sm">{error}</p>
-          <button
-            onClick={loadZones}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus-ring"
-          >
+          <Button variant="danger" className="mt-2" onClick={loadZones}>
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-96 w-full overflow-hidden shadow-lg border border-gray-200 relative">
+    <div className="h-96 w-full overflow-hidden shadow-card border border-border relative">
       <ProvinceDebugger />
       <MapContainer
         center={mapCenter}
@@ -116,16 +114,16 @@ const VietnamMap: React.FC = () => {
           >
             <Popup>
               <div className="p-2 min-w-[200px]">
-                <h3 className="font-semibold text-lg text-gray-800">
+                <h3 className="font-semibold text-lg text-foreground">
                   {zone.name}
                 </h3>
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-sm text-muted-foreground mb-1">
                   {zone.nameVi}
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-muted-foreground mb-2">
                   {zone.region}
                 </p>
-                <div className="space-y-1 text-xs text-gray-700">
+                <div className="space-y-1 text-xs text-foreground">
                   <p><strong>Population:</strong> {(zone.population / 1000000).toFixed(1)}M</p>
                   <p><strong>GDP:</strong> ${(zone.gdp / 1000000000).toFixed(1)}B</p>
                   <p><strong>Area:</strong> {zone.area.toLocaleString()} km²</p>
@@ -134,7 +132,7 @@ const VietnamMap: React.FC = () => {
                   {zone.industries.slice(0, 3).map((industry) => (
                     <span
                       key={industry}
-                      className="px-2 py-1 bg-gray-100 text-xs rounded"
+                      className="px-2 py-1 bg-muted text-xs rounded"
                     >
                       {t(`industries.${industry}`)}
                     </span>
@@ -142,7 +140,7 @@ const VietnamMap: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedZone(zone.id)}
-                  className="mt-2 w-full px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 focus-ring"
+                  className="mt-2 w-full px-3 py-1 bg-brand text-white text-sm rounded-button hover:bg-brand-hover focus-ring"
                 >
                   View Details
                 </button>
@@ -160,7 +158,7 @@ const VietnamMap: React.FC = () => {
             return zone ? (
               <div>
                 <h4 className="font-semibold text-sm">{zone.name}</h4>
-                <p className="text-xs text-gray-600">{zone.nameVi}</p>
+                <p className="text-xs text-muted-foreground">{zone.nameVi}</p>
                 <div
                   className="w-4 h-4 rounded-full mt-1"
                   style={{ backgroundColor: zone.color }}

@@ -67,9 +67,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
       <button
         data-testid="mobile-menu-button"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed top-4 left-4 z-[5000] lg:hidden bg-white rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow"
+        className="fixed top-4 left-4 z-[5000] lg:hidden bg-card rounded-button shadow-md p-3 hover:shadow-lg transition-shadow"
       >
-        <FontAwesomeIcon icon={isMobileOpen ? faTimes : faBars} className="w-5 h-5 text-gray-700" />
+        <FontAwesomeIcon icon={isMobileOpen ? faTimes : faBars} className="w-5 h-5 text-foreground" />
       </button>
 
       {/* Mobile Overlay */}
@@ -84,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
       <aside
         data-testid="navbar"
         className={`
-          fixed top-0 left-0 h-screen bg-white shadow-xl z-[4500]
+          fixed top-0 left-0 h-screen bg-card shadow-overlay z-[4500]
           transition-all duration-300 ease-in-out
           ${isCollapsed ? 'w-20' : 'w-72'}
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -92,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
       >
         <div className="flex flex-col h-full">
           {/* Top Section - Logo & Collapse */}
-          <div className="border-b border-gray-100">
+          <div className="border-b border-border">
             {/* Logo & Brand */}
             <div className={`p-6 pb-4 ${isCollapsed ? 'px-4' : ''}`}>
               <div
@@ -100,15 +100,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
                 className={`flex items-center cursor-pointer group ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
                 onClick={() => handleNavClick('/')}
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:shadow-lg transition-shadow flex-shrink-0">
+                <div className="w-10 h-10 bg-gradient-to-br from-accent-from to-accent-to rounded-xl flex items-center justify-center group-hover:shadow-lg transition-shadow flex-shrink-0">
                   <span className="text-white font-bold text-lg">VN</span>
                 </div>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-base font-bold text-gray-900 leading-tight truncate">
+                    <h1 className="text-base font-bold text-foreground leading-tight truncate">
                       {language === 'vi' ? 'Vùng Kinh Tế' : 'Economic Zones'}
                     </h1>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-muted-foreground truncate">
                       {language === 'vi' ? 'Việt Nam' : 'Vietnam'}
                     </p>
                   </div>
@@ -121,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
               <button
                 data-guide="sidebar-collapse"
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="hidden lg:flex items-center justify-center w-full py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                className="hidden lg:flex items-center justify-center w-full py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-button transition-colors"
                 title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
                 <FontAwesomeIcon
@@ -208,21 +208,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
           </nav>
 
           {/* Bottom Section - Language & Profile */}
-          <div className="border-t border-gray-100 p-4">
+          <div className="border-t border-border p-4">
             {/* Language Dropdown */}
             <div className="relative mb-4" ref={languageDropdownRef}>
               <button
                 data-testid="language-selector"
                 data-guide="sidebar-language"
                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                className={`w-full flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 bg-card border border-border rounded-button hover:bg-muted transition-all ${
                   isCollapsed ? 'justify-center' : 'justify-between'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faGlobe} className="w-4 h-4 text-gray-600" />
+                  <FontAwesomeIcon icon={faGlobe} className="w-4 h-4 text-muted-foreground" />
                   {!isCollapsed && (
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-foreground">
                       {currentLanguage.label}
                     </span>
                   )}
@@ -230,14 +230,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
                 {!isCollapsed && (
                   <FontAwesomeIcon
                     icon={faChevronDown}
-                    className={`w-3 h-3 text-gray-500 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`}
+                    className={`w-3 h-3 text-muted-foreground transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`}
                   />
                 )}
               </button>
 
               {/* Language Dropdown Menu */}
               {showLanguageDropdown && (
-                <div className="absolute bottom-full mb-2 left-0 right-0 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                <div className="absolute bottom-full mb-2 left-0 right-0 bg-card rounded-card shadow-overlay border border-border overflow-hidden z-50">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
@@ -246,20 +246,20 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
                         useUIStore.getState().setLanguage(lang.code);
                         setShowLanguageDropdown(false);
                       }}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                        language === lang.code ? 'bg-indigo-50' : ''
+                      className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted transition-colors ${
+                        language === lang.code ? 'bg-brand-subtle' : ''
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{lang.flag}</span>
                         <span className={`text-sm font-medium ${
-                          language === lang.code ? 'text-indigo-600' : 'text-gray-700'
+                          language === lang.code ? 'text-brand' : 'text-foreground'
                         }`}>
                           {lang.label}
                         </span>
                       </div>
                       {language === lang.code && (
-                        <FontAwesomeIcon icon={faCheck} className="w-4 h-4 text-indigo-600" />
+                        <FontAwesomeIcon icon={faCheck} className="w-4 h-4 text-brand" />
                       )}
                     </button>
                   ))}

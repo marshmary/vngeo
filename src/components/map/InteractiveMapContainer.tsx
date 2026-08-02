@@ -7,6 +7,7 @@ import { gadmService, type ZoneGeoJSON } from '@/services/gadmService';
 import { ZONE_METADATA } from '@/utils/zoneProvinces';
 import ParacelIslandsLabel from './ParacelIslandsLabel';
 import SpratlyIslandsLabel from './SpratlyIslandsLabel';
+import { Button } from '@/components/ui';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -68,7 +69,7 @@ const MapControls: React.FC = () => {
     <div data-guide="map-controls" className="absolute top-4 left-4 z-[1000] flex flex-col space-y-2">
       <button
         onClick={handleZoomIn}
-        className="bg-white hover:bg-gray-50 border border-gray-300 rounded px-3 py-2 shadow-md focus-ring"
+        className="bg-card hover:bg-muted border border-border rounded px-3 py-2 shadow-card focus-ring"
         aria-label="Zoom in"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +79,7 @@ const MapControls: React.FC = () => {
 
       <button
         onClick={handleZoomOut}
-        className="bg-white hover:bg-gray-50 border border-gray-300 rounded px-3 py-2 shadow-md focus-ring"
+        className="bg-card hover:bg-muted border border-border rounded px-3 py-2 shadow-card focus-ring"
         aria-label="Zoom out"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +89,7 @@ const MapControls: React.FC = () => {
 
       <button
         onClick={handleResetView}
-        className="bg-white hover:bg-gray-50 border border-gray-300 rounded px-3 py-2 shadow-md focus-ring"
+        className="bg-card hover:bg-muted border border-border rounded px-3 py-2 shadow-card focus-ring"
         title={language === 'vi' ? 'Đặt lại bản đồ' : 'Reset map view'}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,28 +281,28 @@ const InteractiveMapContainer: React.FC = () => {
 
     const popupContent = `
       <div class="p-3 min-w-[250px]">
-        <h3 class="font-semibold text-lg text-gray-800 mb-1">
+        <h3 class="font-semibold text-lg text-foreground mb-1">
           ${zoneMetadata.name}
         </h3>
-        <p class="text-sm text-gray-600 mb-2">
+        <p class="text-sm text-muted-foreground mb-2">
           ${zoneMetadata.nameVi}
         </p>
         ${zone ? `
-          <div class="space-y-1 text-xs text-gray-700">
+          <div class="space-y-1 text-xs text-foreground">
             <p><strong>Population:</strong> ${(zone.population / 1000000).toFixed(1)}M</p>
             <p><strong>GDP:</strong> $${(zone.gdp / 1000000000).toFixed(1)}B</p>
             <p><strong>Area:</strong> ${zone.area.toLocaleString()} km²</p>
           </div>
           <div class="mt-2 flex flex-wrap gap-1">
             ${translatedIndustries.map((industry: string) =>
-              `<span class="px-2 py-1 bg-gray-100 text-xs rounded">${industry}</span>`
+              `<span class="px-2 py-1 bg-muted text-xs rounded">${industry}</span>`
             ).join('')}
           </div>
         ` : ''}
         ${provinceList ? `
           <div class="border-t pt-2 mt-2">
-            <p class="text-xs font-medium text-gray-700 mb-1">Provinces:</p>
-            <p class="text-xs text-gray-600">${provinceList}${remainingCount}</p>
+            <p class="text-xs font-medium text-foreground mb-1">Provinces:</p>
+            <p class="text-xs text-muted-foreground">${provinceList}${remainingCount}</p>
           </div>
         ` : ''}
       </div>
@@ -364,14 +365,14 @@ const InteractiveMapContainer: React.FC = () => {
 
   if (isLoading || isLoadingBoundaries) {
     return (
-      <div className="h-96 w-full bg-gray-100 flex items-center justify-center">
+      <div className="h-96 w-full bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">
             {language === 'vi' ? 'Đang tải bản đồ...' : 'Loading map...'}
           </p>
           {isLoadingBoundaries && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {language === 'vi' ? 'Đang xử lý dữ liệu tỉnh thành...' : 'Processing administrative data...'}
             </p>
           )}
@@ -382,18 +383,15 @@ const InteractiveMapContainer: React.FC = () => {
 
   if (error) {
     return (
-      <div className="h-96 w-full bg-red-50 border border-red-200 flex items-center justify-center">
-        <div className="text-center text-red-600">
+      <div className="h-96 w-full bg-danger-soft border border-danger/30 flex items-center justify-center">
+        <div className="text-center text-danger">
           <p className="font-semibold">
             {language === 'vi' ? 'Lỗi tải bản đồ' : 'Error loading map'}
           </p>
           <p className="text-sm">{error}</p>
-          <button
-            onClick={loadZones}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus-ring"
-          >
+          <Button variant="danger" className="mt-2" onClick={loadZones}>
             {language === 'vi' ? 'Thử lại' : 'Try Again'}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -442,7 +440,7 @@ const InteractiveMapContainer: React.FC = () => {
       {/* Economic Zone Legend */}
       <div data-testid="map-legend" data-guide="map-legend" className="legend-container">
         <div className="mb-3">
-          <h4 className="font-semibold text-sm text-gray-900">
+          <h4 className="font-semibold text-sm text-foreground">
             {language === 'vi' ? 'VÙNG KINH TẾ' : 'ECONOMIC ZONES'}
           </h4>
         </div>
@@ -453,15 +451,15 @@ const InteractiveMapContainer: React.FC = () => {
               key={zoneId}
               data-testid={`zone-button-${zoneId}`}
               onClick={() => handleLegendClick(zoneId)}
-              className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors duration-200 hover:bg-gray-50 ${
-                selectedZone === zoneId ? 'bg-blue-50 border border-blue-200' : ''
+              className={`w-full flex items-center space-x-2 p-2 rounded-button transition-colors duration-200 hover:bg-muted ${
+                selectedZone === zoneId ? 'bg-brand-subtle border border-brand/30' : ''
               }`}
             >
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: metadata.color }}
               ></div>
-              <span className="text-xs text-gray-700 font-medium">
+              <span className="text-xs text-foreground font-medium">
                 {language === 'vi' ? metadata.nameVi : metadata.name}
               </span>
             </button>
