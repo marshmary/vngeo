@@ -12,6 +12,20 @@ import { createDocument } from './factories/document-factory';
 
 export const test = base.extend({
   /**
+   * Fixture: page (overridden)
+   * Suppress the homepage first-time guide overlay (FirstTimeGuide) so it does
+   * not intercept clicks during tests. The guide auto-shows ~1s after a fresh
+   * visit and blocks interaction with the sidebar until dismissed; each test
+   * runs in a fresh context so it would otherwise appear every run.
+   */
+  page: async ({ page }, use) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('vn-economic-zones-guide-completed', 'true');
+    });
+    await use(page);
+  },
+
+  /**
    * Fixture: testUser
    * Creates a test user with optional overrides.
    * Automatically cleaned up after each test.

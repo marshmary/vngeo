@@ -39,7 +39,7 @@ test.describe('Language Switching', () => {
       await page.goto('/');
 
       // Should show Vietnamese text
-      await expect(page.getByText(/Khu vực kinh tế|Economic Zones/i)).toBeVisible();
+      await expect(page.getByText(/Vùng Kinh Tế|Economic Zones/i)).toBeVisible();
     });
 
     test('should display Vietnamese UI elements on homepage', async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe('Language Switching', () => {
       await page.waitForTimeout(500);
 
       // Should show English text
-      await expect(page.getByText(/Economic Zones|Vietnam/i)).toBeVisible();
+      await expect(page.getByText(/Economic Zones|Vietnam/i).first()).toBeVisible();
     });
 
     test('should persist language selection across navigation', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('Language Switching', () => {
       await page.waitForTimeout(500);
 
       // Should still show English
-      await expect(page.getByText(/Economic Zones|Geography Zone Documents/i)).toBeVisible();
+      await expect(page.getByText(/Economic Zones|Geography Zone Documents/i).first()).toBeVisible();
     });
   });
 
@@ -107,7 +107,7 @@ test.describe('Language Switching', () => {
       await page.waitForTimeout(500);
 
       // Should show Vietnamese text
-      await expect(page.getByText(/Khu vực kinh tế/i)).toBeVisible();
+      await expect(page.getByText(/Vùng Kinh Tế/i).first()).toBeVisible();
     });
   });
 
@@ -132,13 +132,13 @@ test.describe('Language Switching', () => {
       await setLanguage(page, 'en');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText('Economic Zones')).toBeVisible();
+      await expect(page.getByText('Economic Zones').first()).toBeVisible();
 
       // Switch to Vietnamese
       await setLanguage(page, 'vi');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText(/Khu vực kinh tế/i)).toBeVisible();
+      await expect(page.getByText(/Vùng Kinh Tế/i).first()).toBeVisible();
     });
 
     test('should update island labels on language change', async ({ page }) => {
@@ -187,13 +187,13 @@ test.describe('Language Switching', () => {
       await setLanguage(page, 'en');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText('All')).toBeVisible();
+      await expect(page.getByText('All').first()).toBeVisible();
 
       // Switch to Vietnamese
       await setLanguage(page, 'vi');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText('Tất cả')).toBeVisible();
+      await expect(page.getByText('Tất cả').first()).toBeVisible();
     });
 
     test('should update download button text on language change', async ({ page }) => {
@@ -228,13 +228,13 @@ test.describe('Language Switching', () => {
       await setLanguage(page, 'en');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText('Feedback')).toBeVisible();
+      await expect(page.getByText('Feedback').first()).toBeVisible();
 
       // Switch to Vietnamese
       await setLanguage(page, 'vi');
       await page.waitForTimeout(500);
 
-      await expect(page.getByText('Phản hồi')).toBeVisible();
+      await expect(page.getByText('Phản hồi').first()).toBeVisible();
     });
   });
 

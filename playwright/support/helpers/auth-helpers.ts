@@ -37,9 +37,12 @@ export async function loginUser(page: Page, user: Pick<User, 'email' | 'password
 export async function loginAdmin(page: Page, adminUser: Pick<User, 'email' | 'password'>): Promise<void> {
   await loginUser(page, adminUser);
 
-  // Verify admin badge is visible
-  const adminBadge = page.getByTestId('admin-badge').first();
-  await adminBadge.waitFor({ state: 'visible', timeout: 5000 });
+  // Confirm the session has admin privileges. The app indicates admin status
+  // via the user-menu "admin-dashboard-link" (there is no admin badge), so we
+  // verify by loading /admin — which non-admins are redirected away from.
+  await page.goto('/admin');
+  const adminDashboard = page.getByTestId('admin-dashboard');
+  await adminDashboard.waitFor({ state: 'visible', timeout: 10000 });
 }
 
 /**

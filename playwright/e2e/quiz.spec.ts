@@ -17,7 +17,7 @@ test.describe('Quizzes', () => {
       await expect(page.getByTestId('quiz-list-page')).toBeVisible();
 
       // Page should have a title
-      await expect(page.getByText(/Quiz|quiz|test/i)).toBeVisible();
+      await expect(page.getByText(/Quiz|quiz|test/i).first()).toBeVisible();
     });
 
     test('should filter quizzes by difficulty', async ({ page }) => {
@@ -50,7 +50,7 @@ test.describe('Quizzes', () => {
 
       // Should either show the quiz page or an error state
       // The page handles loading/error states gracefully
-      const content = page.getByText(/quiz|loading|error/i);
+      const content = page.getByText(/quiz|loading|error|tải|kiểm tra/i);
       await expect(content.first()).toBeVisible({ timeout: 5000 });
     });
 
@@ -68,7 +68,7 @@ test.describe('Quizzes', () => {
 
       // Either quiz content loads or error shows
       const quizPage = page.getByTestId('quiz-page');
-      const errorMessage = page.getByText(/error|not found|failed/i);
+      const errorMessage = page.getByText(/error|not found|failed|không thể|không tìm/i);
 
       // Either we're on the quiz page or see an error (both are valid responses)
       await expect(quizPage.or(errorMessage)).toBeVisible({ timeout: 5000 });

@@ -16,19 +16,20 @@ test.describe('Feedback Page', () => {
       await expect(page).toHaveTitle(/Vietnam Economic Zones/i);
 
       // Should show feedback page container
-      const feedbackHeader = page.getByText(/Phản hồi|Feedback/i);
+      const feedbackHeader = page.getByText(/Phản hồi|Feedback/i).first();
       await expect(feedbackHeader).toBeVisible();
     });
 
     test('should show loading state while fetching form URL', async ({ page }) => {
-      await page.goto('/feedback');
+      // Hold the settings fetch so the loading spinner is deterministically
+      // visible (otherwise the transient spinner races with the assertion).
+      await page.route('**/rest/v1/general_settings**', async (route) => {
+        await new Promise((r) => setTimeout(r, 1500));
+        await route.continue();
+      });
 
-      // Loading spinner should appear briefly
-      const loadingSpinner = page.locator('.animate-spin');
-      // Since loading is transient, we use a soft assertion
-      if (await loadingSpinner.count() > 0) {
-        await expect(loadingSpinner.first()).toBeVisible();
-      }
+      await page.goto('/feedback');
+      await expect(page.locator('.animate-spin').first()).toBeVisible();
     });
 
     test('should show header with title and description', async ({ page }) => {
@@ -161,7 +162,7 @@ test.describe('Feedback Page', () => {
       await page.waitForTimeout(500);
 
       // Should show English text
-      await expect(page.getByText('Feedback')).toBeVisible();
+      await expect(page.getByText('Feedback').first()).toBeVisible();
     });
 
     test('should update description on language change', async ({ page }) => {

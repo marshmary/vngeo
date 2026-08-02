@@ -252,14 +252,23 @@ test.describe('Navigation and Routing', () => {
     test('should open external links in new tab', async ({ page }) => {
       await page.goto('/documents');
 
-      // Find external link (download links might be external)
-      const externalLink = page.locator('a').filter({ has: href =>
-        href && (href.startsWith('http://') || href.startsWith('https://')) && !href.includes(window.location.origin)
+      // Collect targets of external (cross-origin) links via the page DOM.
+      // (Playwright locator `.filter({ has })` requires a locator, not a
+      // function — the previous form threw "Inner has locator must belong
+      // to the same frame", so evaluate in-page instead.)
+      const externalTargets = await page.evaluate(() => {
+        const origin = window.location.origin;
+        return Array.from(document.querySelectorAll('a[href^="http"]'))
+          .filter((a) => {
+            try { return new URL((a as HTMLAnchorElement).href).origin !== origin; }
+            catch { return false; }
+          })
+          .map((a) => (a as HTMLAnchorElement).target);
       });
 
-      if (await externalLink.count() > 0) {
-        const hasTargetBlank = await externalLink.first().getAttribute('target');
-        expect(hasTargetBlank).toBe('_blank');
+      // Any external link that exists should open in a new tab
+      for (const target of externalTargets) {
+        expect(target).toBe('_blank');
       }
     });
   });

@@ -11,7 +11,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
 
     // Check page title
-    await expect(page).toHaveTitle(/Vietnam Economic Zone/i);
+    await expect(page).toHaveTitle(/Viet Nam Economic Zone/i);
 
     // Check main navigation (sidebar) is visible on desktop
     const navbar = page.getByTestId('navbar');
@@ -65,14 +65,14 @@ test.describe('Homepage', () => {
 
     // Verify English text is visible (check for common English UI elements)
     // The page title should update to contain English text
-    await expect(page.getByText(/Economic Zones/i)).toBeVisible();
+    await expect(page.getByText(/Economic Zones/i).first()).toBeVisible();
 
     // Switch back to Vietnamese
     await page.click('[data-testid="language-selector"]');
     await page.click('[data-testid="language-option-vi"]');
 
     // Verify Vietnamese text is visible
-    await expect(page.getByText(/Vùng Kinh Tế|Kinh Tế/i)).toBeVisible();
+    await expect(page.getByText(/Vùng Kinh Té|Kinh Tế/i).first()).toBeVisible();
   });
 
   test('should show Paracel and Spratly islands labels', async ({ page }) => {
