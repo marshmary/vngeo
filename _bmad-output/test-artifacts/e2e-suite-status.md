@@ -2,6 +2,26 @@
 
 > Living status document for the Playwright E2E suite. Latest update: **2026-08-02**.
 
+## ⚙️ How to run — locally, after each full dev flow
+
+**Convention: there is intentionally NO CI gate right now.** After every complete
+development flow, run the e2e suite **locally** against the local Supabase stack.
+
+Prerequisites: local Supabase up (`cd supabase && docker compose up -d`, or
+`npm run supabase:reseed` to reset + reseed), app `.env.local` pointing at
+`http://localhost:8000`, and `playwright/.env` populated (TEST_ADMIN_*, TEST_USER_*,
+SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, TEST_RUN_CRUD_WRITE).
+
+```bash
+npm run test:e2e:full     # read suite then CRUD write suite (chromium) — the default full check
+# or individually:
+npm run test:e2e          # read baseline (CRUD skips) — chromium by default
+npm run test:e2e:crud     # CRUD write suite (chromium, forces TEST_RUN_CRUD_WRITE=1)
+```
+
+Mobile / cross-browser (optional): `npx playwright test --project=mobile-chrome`
+(webkit / mobile-safari also available). See "Current state" below.
+
 ## Current state (2026-08-02)
 
 | Suite | Command | Status |
@@ -34,9 +54,11 @@ Prerequisite for any local run: local Supabase stack up (`cd supabase && podman 
 
 ## In progress
 
-- **Mobile read-suite hardening (test-side):** add `data-testid` for the mobile hamburger button, add a `openMobileSidebarIfNeeded()` helper, update sidebar-dependent flows (logout, admin user-menu, language switching, homepage/map mobile interactions). Validate on mobile-chrome, then mobile-safari.
+- Nothing active. Mobile hardening is complete (mobile-chrome 162/0, mobile-safari 161/0; see commit `5f267c4`).
+- **CI gate intentionally OFF.** A GitHub Actions e2e workflow was scaffolded via `bmad-testarch-ci`, then removed per project decision — e2e runs locally after each full dev flow (see "⚙️ How to run" above). Re-add when CI gating is wanted.
 
 ## History
 
 - **2026-08-01** — Framework scaffolded (Playwright, fixtures, factories, helpers) via `bmad-testarch-framework`. 10 read specs authored via `bmad-qa-generate-e2e-tests`; brought to chromium-green in `1792b09` (168 tests).
 - **2026-08-02** — CRUD write-path suites added (`9e9fe3d`), debugged per `CRUD_DEBUG_SPEC.md`; write paths green on chromium. Mobile hardening started.
+- **2026-08-02 (later)** — Mobile suite green (mobile-chrome 162/0, mobile-safari 161/0; commit `5f267c4`). CI workflow scaffolded via `bmad-testarch-ci` then removed — e2e runs locally after each full dev flow; CI not required for now.
