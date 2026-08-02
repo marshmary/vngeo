@@ -65,7 +65,19 @@ let serviceClient: SupabaseClient | null = null;
 let snapshot: SettingsSnapshot | undefined;
 
 // =============================================================================
-test.describe('Admin Settings CRUD — §4.3', () => {
+// SERIAL: these tests mutate the SAME two shared `general_settings` rows
+// (`feedback_form_url`, `map_drawing_video_url`) via the global SettingsService.
+// `playwright.config.ts` sets `fullyParallel: true`, which would otherwise run
+// the feedback and video write-tests on concurrent workers against those shared
+// rows. Each save helper pins the field NOT under test to a stable placeholder,
+// so under parallel execution the slower test's /feedback or /map-drawing read
+// races and picks up the OTHER test's placeholder (the value under test gets
+// overwritten mid-flight) — a flaky, order-dependent failure that swaps between
+// the two tests run-to-run. The fix is to serialize the block so the writes are
+// strictly ordered. (Root cause validated: forcing --workers=1 made the suite
+// pass deterministically; neither FeedbackPage nor SettingsService caches —
+// both refetch on mount, so the original "stale cache" hypothesis was wrong.)
+test.describe.serial('Admin Settings CRUD — §4.3', () => {
   // --- Per-test gate --------------------------------------------------------
   // Skips each test cleanly when writes are off, credentials are missing, or
   // the service-role key is absent (no teardown possible -> can't guarantee

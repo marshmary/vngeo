@@ -116,8 +116,9 @@ test.describe.serial('Quiz CRUD (write-path)', () => {
 
     // Listed in the manager with the E2E title and default draft status
     // (createQuiz inserts status='draft'). Status badge text is locale-aware,
-    // so match both Vietnamese and English labels.
-    await expect(quizRowByTitle(page, title)).toBeVisible();
+    // so match both Vietnamese and English labels. The manager list fetches
+    // async on mount, so allow extra time on cold dev-server starts.
+    await expect(quizRowByTitle(page, title)).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId(quizStatusTestId(quizId))).toHaveText(/nháp|draft/i);
 
     // Full round-trip cleanup: delete proves the delete path too.
@@ -133,7 +134,17 @@ test.describe.serial('Quiz CRUD (write-path)', () => {
       difficulty: 'easy',
     });
 
-    // buildQuizViaUI lands on the editor for the new quiz.
+    // buildQuizViaUI lands on the editor for the new quiz. Add ONE question so
+    // the quiz-level Save button is enabled — QuizEditPage guards it with
+    // `disabled={... || questions.length === 0}` (a quiz with no questions is
+    // not saveable). This test exercises metadata persistence, not that guard
+    // (which test 6 covers), so a single valid question is the correct setup.
+    await addQuestionViaUI(page, 0, {
+      text: '[E2E] Meta placeholder Q',
+      options: ['A', 'B'],
+      correctIndex: 0,
+    });
+
     const updatedTitle = makeQuizTitle('Edit Meta UPDATED');
     await page.getByTestId(QUIZ_TITLE_INPUT).fill(updatedTitle);
     await page.getByTestId(QUIZ_DESCRIPTION_INPUT).fill('[E2E] updated description');

@@ -20,7 +20,9 @@
 // =============================================================================
 
 import { expect, type Locator, type Page } from '@playwright/test';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loginAdmin } from '../helpers/auth-helpers';
@@ -59,14 +61,29 @@ export const hasAdminCredentials = (): boolean =>
   !!process.env.TEST_ADMIN_EMAIL && !!process.env.TEST_ADMIN_PASSWORD;
 
 /**
+ * Prefix every E2E document is named with so the document-scoped teardown sweep
+ * (cleanupRootE2eDocs, run in document-crud.spec.ts afterAll) can reap them.
+ *
+ * WHY NOT the `[E2E-` bracket tag used elsewhere: Supabase Storage rejects
+ * object keys containing square brackets with HTTP 400 "Invalid key"
+ * (validated directly: an authenticated admin upload of `[E2E-x].pdf` is
+ * rejected, while the same payload under a clean or parenthesized key
+ * succeeds). So the `[E2E-` tag that the shared cleanupE2EEntities() matches
+ * is unusable for Storage uploads, and this suite uses a bracket-free prefix
+ * with its own service-role sweep instead. See CRUD_DEBUG_SPEC §4.
+ */
+export const E2E_DOC_NAME_PREFIX = 'e2e-doc-';
+
+/**
  * Unique, cleanup-targetable file name. Every created storage object is named
- * `[E2E-doc-<label>-<stamp>-<rand>].pdf` so the `[E2E-` teardown sweep
- * (cleanupE2EEntities) catches it even from the bucket root.
+ * `e2e-doc-<label>-<stamp>-<rand>.pdf` (bracket-free — see
+ * E2E_DOC_NAME_PREFIX) so the document-scoped teardown sweep catches it from
+ * the bucket root.
  */
 export function e2eDocName(label: string): string {
   const stamp = Date.now().toString(36);
   const rand = Math.random().toString(36).slice(2, 6);
-  return `[E2E-doc-${label}-${stamp}-${rand}].pdf`;
+  return `${E2E_DOC_NAME_PREFIX}${label}-${stamp}-${rand}.pdf`;
 }
 
 // --- memoized binary payloads ------------------------------------------------
@@ -231,7 +248,19 @@ export async function assertOversizeRejected(
 ): Promise<void> {
   await page.getByTestId('document-upload-button').click();
   const input = page.getByTestId('document-upload-input');
-  await expect(input).toBeVisible();
+  // The file input is hidden by design (className="hidden", button-triggered).
+  // toBeVisible() would fail immediately on the hidden element; wait for it to
+  // attach instead — same fix already applied in uploadDocumentViaUI.
+  await input.waitFor({ state: 'attached', timeout: 10_000 });
+
+  // Playwright refuses INLINE buffers larger than 50Mb ("Cannot set buffer
+  // larger than 50Mb"), and the oversize payload is by definition one byte over
+  // the 50MB app cap — so it always exceeds Playwright's inline limit. Write it
+  // to a temp file and pass the path instead. The browser-visible File.name is
+  // the path's basename, so name the temp file with the tagged <name> to keep
+  // the "rejected file not selected" assertion meaningful.
+  const tmpPath = path.join(os.tmpdir(), name);
+  fs.writeFileSync(tmpPath, buffer);
 
   // FileUpload.handleChange fires a native alert() for oversize files. Register
   // a one-shot handler BEFORE the action so Playwright doesn't auto-dismiss it;
@@ -242,7 +271,17 @@ export async function assertOversizeRejected(
     await d.accept();
   });
 
-  await input.setInputFiles({ name, mimeType: 'application/pdf', buffer });
+  try {
+    await input.setInputFiles(tmpPath);
+  } finally {
+    // The browser has already read file.size/file.name and rejected the file by
+    // the time setInputFiles resolves, so the temp file can be removed now.
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch {
+      /* best-effort cleanup */
+    }
+  }
 
   // FileUpload.handleChange alert: "The following files exceed the <N>MB size
   // limit: ...".
@@ -253,4 +292,64 @@ export async function assertOversizeRejected(
   // File was not selected — submit stays disabled and no row is rendered.
   await expect(page.getByTestId('document-upload-submit')).toBeDisabled();
   await expect(page.getByText(name)).toHaveCount(0);
+}
+
+// --- teardown ---------------------------------------------------------------
+
+/**
+ * Reap the root-level E2E documents this suite creates.
+ *
+ * The shared `cleanupE2EEntities()` matches the `[E2E-` bracket tag and the
+ * `__e2e__/` folder prefix — NEITHER of which document uploads can use:
+ *   - `[` `]` are rejected by Supabase Storage (HTTP 400 "Invalid key"; see
+ *     E2E_DOC_NAME_PREFIX), and
+ *   - this suite uploads at the bucket root so the admin file-manager list
+ *     assertion works unchanged.
+ * So uploads are tagged with the bracket-free `E2E_DOC_NAME_PREFIX` and swept
+ * here with a service-role client (RLS-bypassing). Best-effort: never throws,
+ * no-ops when nothing matches. Called in document-crud.spec.ts afterAll
+ * alongside the shared cleanupE2EEntities() safety-net.
+ */
+export async function cleanupRootE2eDocs(client: SupabaseClient): Promise<number> {
+  const pageSize = 1000;
+  const paths: string[] = [];
+  let offset = 0;
+
+  // Paginate the bucket root and collect every real file (id != null) whose
+  // name carries our prefix. Folders (id == null) are never touched.
+  for (;;) {
+    const { data, error } = await client.storage
+      .from('documents')
+      .list('', { limit: pageSize, offset });
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn('[document-crud] cleanupRootE2eDocs list error:', error.message);
+      return 0;
+    }
+    if (!data || data.length === 0) break;
+    for (const it of data) {
+      if (it.id && typeof it.name === 'string' && it.name.startsWith(E2E_DOC_NAME_PREFIX)) {
+        paths.push(it.name);
+      }
+    }
+    if (data.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  if (paths.length === 0) return 0;
+
+  let removed = 0;
+  for (let i = 0; i < paths.length; i += 500) {
+    const batch = paths.slice(i, i + 500);
+    const { error } = await client.storage.from('documents').remove(batch);
+    if (error) {
+      // Don't abort the whole sweep — record and stop (a partial batch failure
+      // usually means the listing is stale; the next run reaps the rest).
+      // eslint-disable-next-line no-console
+      console.warn('[document-crud] cleanupRootE2eDocs remove error:', error.message);
+      break;
+    }
+    removed += batch.length;
+  }
+  return removed;
 }
