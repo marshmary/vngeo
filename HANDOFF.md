@@ -43,6 +43,11 @@ Grep `(bg|text|border|ring)-(indigo|gray|...)-NNN` across `src/` hits only:
 
 No other raw utilities remain in `src/` (map components and zone-data constants are excluded by contract).
 
+- **Docs plan:** the documentation follow-up for this restructure lives at
+  `_bmad-output/planning-artifacts/docs-update-plan.md` (Doc-Goals 1–4). Execute it the same way as this
+  file's goals — *"Read docs-update-plan.md and execute the next Doc-Goal."* Doc-Goals 2–4 gate on
+  Goals 2–4 below; Doc-Goal 1 is ungated and already in progress on this branch.
+
 ---
 
 ## Goal 1 — Close out the Phase 3 review  ✅ DONE 2026-09-05
