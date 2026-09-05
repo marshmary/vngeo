@@ -1,6 +1,6 @@
 # Vietnam Economic Zones - Modern Dark UI Specification
 
-> ⚠️ **SUPERSEDED 2026-08-02** — the visual direction in this spec (dark theme, ad-hoc Vietnam palette) was replaced by the DESIGN.md design system: an indigo light theme with semantic tokens in `tailwind.config.js` and the `src/components/ui/` primitives. See [`/DESIGN.md`](../../DESIGN.md) (source of truth) and [`/MIGRATION-CONTRACT.md`](../../MIGRATION-CONTRACT.md) (migration rules). Kept for historical rationale only — do not implement from this file.
+> ⚠️ **SUPERSEDED 2026-08-02** — the visual direction in this spec (dark theme, ad-hoc Vietnam palette) was replaced by the DESIGN.md design system: an indigo light theme with semantic tokens in `tailwind.config.js` and the `src/components/ui/` primitives. See [`/DESIGN.md`](../../DESIGN.md) (source of truth) and [`/AGENTS.md`](../../AGENTS.md) (styling rules + e2e holdouts). Kept for historical rationale only — do not implement from this file.
 
 ## Project Overview
 Transform the existing Vietnam Economic Zones map interface from a light, basic design to a sophisticated, dark-themed modern interface that enhances user experience and visual appeal.
