@@ -2,7 +2,7 @@
 title: 'Phase 3 styling migration — DocumentsPage + FileCard/FirstTimeGuide leftovers'
 type: 'refactor'
 created: '2026-08-02'
-status: 'in-review'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: '490e7b99d5447042190e1680aaf66136c794678e'
 context: ['{project-root}/MIGRATION-CONTRACT.md']
@@ -73,6 +73,8 @@ context: ['{project-root}/MIGRATION-CONTRACT.md']
 
 ## Spec Change Log
 
+- 2026-09-05 — Review closed out with fresh verification (see Verification Results below); status `in-review` → `done`. One documented deviation: repo-wide `npm run lint` reports 51 errors / 5 warnings, **all confined to `playwright/**`** — pre-existing on `main` (identical eslint 10.8.0 + react-hooks 7.1.1 pins; commit `de2809f` touched zero playwright files), not fixable within contract boundaries (styling-only; `playwright/**` is ask-first/read-only). `src/` — the full blast radius of this migration — lints clean (exit 0). No fix-and-rerun cycle occurred, so `review_loop_iteration` stays 0.
+
 ## Design Notes
 
 New `tailwind.config.js` redefines the radius scale to DESIGN.md values (sm 6/md 8/lg 12/xl 16), so surviving `rounded-lg` on inner icon boxes now resolves via the token scale — leave them; only swap role-aliased radii the contract names (cards/buttons/inputs). `<Pagination>` already encodes the full e2e contract (raw `bg-indigo-600` active page, caller aria-labels, null when ≤1 page) — do not re-implement.
@@ -83,3 +85,18 @@ New `tailwind.config.js` redefines the radius scale to DESIGN.md values (sm 6/md
 - `npm run lint` — expected: no errors
 - `npm run build` — expected: tsc + vite build succeed
 - `npm run test:e2e -- --project=chromium` (prereq: `cd supabase && docker compose up -d`, root `.env.local` → `http://localhost:8000`) — expected: read suite green, no baseline regression
+
+## Verification Results (2026-09-05)
+
+**Environment:** Windows + Git Bash, branch `feature/ui-restructure` @ `de2809f`, clean tree.
+Local Supabase up via `podman compose up -d` (docker-compatible engine; all containers healthy, Kong `GET :8000/auth/v1/health` → 200).
+Root `.env.local` → `http://localhost:8000` ✔. `playwright/.env` holds `TEST_ADMIN_*`, `TEST_USER_*`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` ✔.
+
+| Check | Command | Result |
+|---|---|---|
+| Lint | `npm run lint` | `src/` **clean** (`npx eslint src` exit 0). Repo-wide `eslint .`: 51 errors / 5 warnings — **all in `playwright/**`** (unused vars, react-hooks v7 flagging Playwright's `use()` fixtures, unused eslint-disable directives). Pre-existing on `main` (same eslint ^10.8.0 / react-hooks ^7.1.1 pins; `de2809f` touched zero playwright files); out of contract scope — no fix attempted. |
+| Build | `npm run build` | ✅ tsc + vite succeed (built in 16.8s; pre-existing >500 kB chunk-size warnings only) |
+| E2E read suite | `npm run test:e2e -- --project=chromium` | ✅ Run 1: 167 passed / 1 flaky / 14 skipped in 2.8m — `map-interactions.spec.ts:337` map-load timing assertion (<5s) failed cold at 6.4s, passed on retry. Run 2 (confirmation): **168 passed / 14 skipped / 0 flaky** in 3.3m, exit 0 — exact match to the 2026-08-02 baseline. Zero test edits. |
+| Acceptance grep | raw palette utilities across `src/**/*.{ts,tsx}` | ✅ Matches the handoff residual inventory **exactly**, nothing extra: DocumentsPage holdouts (`bg-indigo-600` ×2, `border-gray-100`, `text-indigo-600 bg-indigo-50`, `text-gray-500` ×2, `bg-blue-50`); active-state `bg-indigo-600` in `AdminPage.tsx` ×4, `QuizListPage.tsx` ×1, `ui/Pagination.tsx` ×3; read-only `ConfirmationModal.tsx` / `LoadingSpinner.tsx` raw classes. |
+
+**Verdict:** green within contract boundaries → status `done`.
