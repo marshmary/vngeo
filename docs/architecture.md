@@ -102,7 +102,7 @@ No stores use `finally` inside actions; auth actions rethrow, map swallows. Auth
 
 ## Component Overview
 
-32 components across `ui/`, `admin/`, `auth/`, `common/`, `debug/`, `guide/`, `map/`, `zone/` plus 9 pages. Global chrome is `<Sidebar>` (+ `<Notification>`); the active map is `InteractiveMapContainer`. Notable dead/legacy code: unused `ProtectedRoute`, unused `NavBar`, legacy `MapContainer`/`ZoneLayer`/`ProvinceDebugger`. **Styling flows through semantic design tokens and the `ui/` primitives** — `DESIGN.md` (repo root) is the source of truth, `MIGRATION-CONTRACT.md` holds the migration rules and raw-class holdouts; zone/map colors remain inline-style data from `constants.ts` (map components are contract-excluded).
+32 components across `ui/`, `admin/`, `auth/`, `common/`, `debug/`, `guide/`, `map/`, `zone/` plus 9 pages. Global chrome is `<Sidebar>` (+ `<Notification>`); the active map is `InteractiveMapContainer`. Notable dead/legacy code: unused `ProtectedRoute`, unused `NavBar`, legacy `MapContainer`/`ZoneLayer`/`ProvinceDebugger`. **Styling flows through semantic design tokens and the `ui/` primitives** — `DESIGN.md` (repo root) is the source of truth, `AGENTS.md` lists the styling rules and raw-class e2e holdouts; zone/map colors remain inline-style data from `constants.ts` (map components are token-exempt).
 
 → Full inventory + route table: [component-inventory.md](./component-inventory.md).
 
@@ -137,7 +137,7 @@ The app is at the **repo root** (`src/`, `public/`, `schemas/`, `playwright/`); 
 - **`react-router` v8**, not `react-router-dom`.
 - **Tailwind v3** config format; `erasableSyntaxOnly` forbids `enum`/`namespace`; `verbatimModuleSyntax` requires `import type`.
 - **`clsx`** is the conditional-class helper in the `src/components/ui/` primitives (adopted 2026-08-02; prefer it over template literals in new primitives).
-- **Styling via semantic tokens, not raw palette utilities** — pages consume `bg-brand` / `text-foreground` / `rounded-card`-style tokens or `ui/` primitives; the only raw colors left are the e2e-asserted contract holdouts (`MIGRATION-CONTRACT.md`) and the data-driven zone palette in `constants.ts`.
+- **Styling via semantic tokens, not raw palette utilities** — pages consume `bg-brand` / `text-foreground` / `rounded-card`-style tokens or `ui/` primitives; the only raw colors left are the e2e-asserted holdouts (listed in `AGENTS.md`) and the data-driven zone palette in `constants.ts`.
 - **`DESIGN.md` is the styling source of truth** — change the visual identity there first, then mirror in `tailwind.config.js`.
 
 ---

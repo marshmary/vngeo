@@ -21,8 +21,7 @@ vngeo/                          # repo root = app root
 ├── .env.local(.example)        # VITE_* (Vite frontend)
 ├── README.md                   # project overview + quick start
 ├── DESIGN.md                   # design-system source of truth (tokens, components, rules) — added 2026-08-02
-├── MIGRATION-CONTRACT.md       # styling-migration rules, token swap map, holdouts — added 2026-08-02
-├── HANDOFF.md                  # self-contained continuation doc (goals for the ui-restructure branch)
+├── AGENTS.md                   # working rules for AI agents (workflow, code rules, e2e contract)
 │
 ├── public/
 │   └── vietnam-map-data/       # static GeoJSON (GADM): gadm41_VNM_0.json (border), gadm41_VNM_1.json (provinces)

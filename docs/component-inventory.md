@@ -26,7 +26,7 @@ No 404 / catch-all route. Future routes (`/zones/:zoneId`, `/zones/:zoneId/docum
 
 ## Components by category
 
-> All categories below were restyled on 2026-08-02 to consume semantic design tokens and/or the `ui/` primitives; component APIs and behavior were unchanged unless noted. The visual source of truth is [`/DESIGN.md`](../DESIGN.md); migration rules and raw-class holdouts live in [`/MIGRATION-CONTRACT.md`](../MIGRATION-CONTRACT.md).
+> All categories below were restyled on 2026-08-02 to consume semantic design tokens and/or the `ui/` primitives; component APIs and behavior were unchanged unless noted. The visual source of truth is [`/DESIGN.md`](../DESIGN.md); styling rules and the raw-class e2e holdouts are listed in [`/AGENTS.md`](../AGENTS.md).
 
 ### `ui/` — shared design-system primitives (added 2026-08-02)
 
@@ -131,9 +131,9 @@ Import from the barrel: `import { Button, Card } from '@/components/ui'`. Every 
 - **Elevation:** `shadow-card`, `shadow-overlay` — two levels only
 - **Type ramp:** `text-display`, `text-heading-1`…`text-heading-3`, paired with `font-heading` (Plus Jakarta Sans); body is `font-sans` (Inter) — both loaded via Google Fonts `<link>` in `index.html`
 
-The pre-restructure latent tokens (`vietnam-red`, `vietnam-yellow`, `mekong-blue`, `rice-green`, `mountain-gray`, `zone-1…6`) were **removed** from the config in the restructure. Zone colors remain **data, not tokens**: hex values on `VIETNAM_ECONOMIC_ZONES[].color` in `src/utils/constants.ts`, applied via inline `style` in the map/zone components — `src/components/map/**` and `src/utils/constants.ts` are excluded from the styling migration by `MIGRATION-CONTRACT.md`, so the islands-label hex `#1e40af` stays as-is.
+The pre-restructure latent tokens (`vietnam-red`, `vietnam-yellow`, `mekong-blue`, `rice-green`, `mountain-gray`, `zone-1…6`) were **removed** from the config in the restructure. Zone colors remain **data, not tokens**: hex values on `VIETNAM_ECONOMIC_ZONES[].color` in `src/utils/constants.ts`, applied via inline `style` in the map/zone components — `src/components/map/**` and `src/utils/constants.ts` are exempt from the token system by design (see `DESIGN.md`), so the islands-label hex `#1e40af` stays as-is.
 
-**Styling rule:** pages must consume these semantic tokens (`bg-brand`, `text-foreground`, `rounded-card`) or the `ui/` primitives — never raw default-palette utilities (`bg-indigo-600`). Known raw-class holdouts (per the contract, some e2e-asserted): `AdminPage.tsx` (×4), `QuizListPage.tsx` (×1), `ui/Pagination.tsx` (×3, active page), plus the contract's read-only files `ConfirmationModal.tsx` / `LoadingSpinner.tsx`. A Phase 4 lint gate (HANDOFF Goal 3) will enforce this mechanically.
+**Styling rule:** pages must consume these semantic tokens (`bg-brand`, `text-foreground`, `rounded-card`) or the `ui/` primitives — never raw default-palette utilities (`bg-indigo-600`). Known raw-class holdouts (some e2e-asserted, listed in `AGENTS.md`): `AdminPage.tsx` (×4), `QuizListPage.tsx` (×1), `ui/Pagination.tsx` (×3, active page), plus the read-only files `ConfirmationModal.tsx` / `LoadingSpinner.tsx`. A lint gate to enforce this mechanically is a known follow-up.
 
 ## Dead / legacy code
 
@@ -152,6 +152,6 @@ The pre-restructure latent tokens (`vietnam-red`, `vietnam-yellow`, `mekong-blue
 ## Related docs
 
 - [DESIGN.md](../DESIGN.md) — visual identity source of truth (tokens, components, rules).
-- [MIGRATION-CONTRACT.md](../MIGRATION-CONTRACT.md) — styling-migration rules, token swap map, holdouts.
+- [AGENTS.md](../AGENTS.md) — agent working rules incl. styling rules and e2e holdouts.
 - [Architecture](./architecture.md) — component-layer patterns in context.
 - [Source Tree Analysis](./source-tree-analysis.md) — where everything lives.
