@@ -31,7 +31,6 @@ vngeo/                          # repo root = app root
 │   ├── main.tsx                # React bootstrap (StrictMode → <App/>)
 │   ├── App.tsx                 # BrowserRouter, initializeAuth() on mount, route table, <Sidebar/> + <Notification/>
 │   ├── index.css               # global styles; Leaflet CSS; Tailwind layers (App.css removed 2026-08-02)
-│   ├── assets/                 # react.svg
 │   │
 │   ├── components/             # React components (default exports)
 │   │   ├── ui/                 # design-system primitives (added 2026-08-02): Button, Card, Input/Textarea/Select,
@@ -69,7 +68,6 @@ vngeo/                          # repo root = app root
 ├── playwright/                 # E2E (run from repo root via npm run test:e2e)
 │   ├── e2e/                    # authentication.spec.ts, homepage.spec.ts, quiz.spec.ts
 │   ├── support/                # fixtures.ts, factories/ (user/quiz/document, faker), helpers/auth-helpers.ts
-│   ├── auth-sessions/          # storage state
 │   └── .env.example            # TEST_ENV, test creds, staging/production URLs
 │
 ├── supabase/                   # ⬅ entire local-Supabase/Docker stack (run docker from HERE)
