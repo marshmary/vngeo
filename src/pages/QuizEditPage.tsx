@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 import { useUIStore } from '@/stores/uiStore';
 import { QuizService, QuizDraftService } from '@/services/quizService';
 import type { Quiz, QuizQuestion, QuizOption } from '@/types/quiz.types';
+import { Button, Input, Textarea, Select, Badge, Spinner } from '@/components/ui';
 
 const QuizEditPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>();
@@ -257,86 +258,87 @@ const QuizEditPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-muted flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</p>
+          <Spinner className="h-12 w-12 mx-auto mb-4" />
+          <p className="text-muted-foreground">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-muted py-8">
       <div className="max-w-6xl mx-auto px-6">
         {/* Draft Prompt Modal */}
         {showDraftPrompt && (
           <div data-testid="draft-prompt" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md mx-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-card rounded-card shadow-overlay p-6 max-w-md mx-4">
+              <h3 className="text-lg font-bold text-foreground mb-4">
                 {language === 'vi' ? 'Bản nháp chưa lưu' : 'Unsaved Draft Found'}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {language === 'vi'
                   ? 'Phát hiện bản nháp chưa lưu cho bài kiểm tra này. Bạn có muốn tiếp tục chỉnh sửa bản nháp không?'
                   : 'An unsaved draft was found for this quiz. Would you like to continue editing the draft?'}
               </p>
               <div className="flex gap-3">
-                <button
+                <Button
                   data-testid="load-draft-button"
                   onClick={loadDraft}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="flex-1"
                 >
                   {language === 'vi' ? 'Tải bản nháp' : 'Load Draft'}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
                   data-testid="discard-draft-button"
                   onClick={discardDraft}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="flex-1"
                 >
                   {language === 'vi' ? 'Bỏ qua' : 'Discard'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
         )}
 
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-card rounded-card shadow-card p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {language === 'vi' ? 'Chỉnh Sửa Bài Kiểm Tra' : 'Edit Quiz'}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {language === 'vi' ? 'Quản lý câu hỏi và câu trả lời' : 'Manage questions and answers'}
               </p>
             </div>
             <div className="flex gap-3">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => navigate('/admin')}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 {language === 'vi' ? 'Hủy' : 'Cancel'}
-              </button>
-              <button
+              </Button>
+              <Button
                 data-testid="save-quiz-button"
                 onClick={handleSaveQuiz}
                 disabled={isSaving || !quizTitle || questions.length === 0}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2"
               >
                 {isSaving ? (language === 'vi' ? 'Đang lưu...' : 'Saving...') : (language === 'vi' ? 'Lưu' : 'Save')}
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Quiz Metadata */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {language === 'vi' ? 'Tiêu đề' : 'Title'}
               </label>
-              <input
+              <Input
                 type="text"
                 data-testid="quiz-title-input"
                 value={quizTitle}
@@ -344,74 +346,69 @@ const QuizEditPage: React.FC = () => {
                   setQuizTitle(e.target.value);
                   setHasUnsavedChanges(true);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder={language === 'vi' ? 'Nhập tiêu đề bài kiểm tra' : 'Enter quiz title'}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {language === 'vi' ? 'Độ khó' : 'Difficulty'}
               </label>
-              <select
+              <Select
                 data-testid="quiz-difficulty-select"
                 value={quizDifficulty}
                 onChange={(e) => {
                   setQuizDifficulty(e.target.value as 'easy' | 'medium' | 'hard');
                   setHasUnsavedChanges(true);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="easy">{language === 'vi' ? 'Dễ' : 'Easy'}</option>
                 <option value="medium">{language === 'vi' ? 'Trung bình' : 'Medium'}</option>
                 <option value="hard">{language === 'vi' ? 'Khó' : 'Hard'}</option>
-              </select>
+              </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {language === 'vi' ? 'Trạng thái' : 'Status'}
               </label>
-              <select
+              <Select
                 data-testid="quiz-status-select"
                 value={quizStatus}
                 onChange={(e) => {
                   setQuizStatus(e.target.value as 'draft' | 'published' | 'archived');
                   setHasUnsavedChanges(true);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="draft">{language === 'vi' ? 'Bản nháp' : 'Draft'}</option>
                 <option value="published">{language === 'vi' ? 'Đã công bố' : 'Published'}</option>
                 <option value="archived">{language === 'vi' ? 'Đã lưu trữ' : 'Archived'}</option>
-              </select>
+              </Select>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {language === 'vi' ? 'Mô tả' : 'Description'}
               </label>
-              <textarea
+              <Textarea
                 data-testid="quiz-description-input"
                 value={quizDescription}
                 onChange={(e) => {
                   setQuizDescription(e.target.value);
                   setHasUnsavedChanges(true);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 rows={3}
                 placeholder={language === 'vi' ? 'Nhập mô tả bài kiểm tra' : 'Enter quiz description'}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 {language === 'vi' ? 'Giới hạn thời gian (phút)' : 'Time Limit (minutes)'}
               </label>
-              <input
+              <Input
                 type="number"
                 value={quizTimeLimit || ''}
                 onChange={(e) => {
                   setQuizTimeLimit(e.target.value ? parseInt(e.target.value) : undefined);
                   setHasUnsavedChanges(true);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder={language === 'vi' ? 'Không giới hạn' : 'No limit'}
                 min={1}
               />
@@ -420,26 +417,25 @@ const QuizEditPage: React.FC = () => {
         </div>
 
         {/* Questions List */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-card rounded-card shadow-card p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-foreground">
               {language === 'vi' ? 'Câu Hỏi' : 'Questions'} ({questions.length})
             </h2>
-            <button
+            <Button
               data-testid="add-question-button"
               onClick={handleAddQuestion}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               {language === 'vi' ? 'Thêm Câu Hỏi' : 'Add Question'}
-            </button>
+            </Button>
           </div>
 
           {questions.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-12 text-muted-foreground">
+              <svg className="w-16 h-16 mx-auto mb-4 text-faint-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <p>{language === 'vi' ? 'Chưa có câu hỏi nào. Nhấn "Thêm Câu Hỏi" để bắt đầu.' : 'No questions yet. Click "Add Question" to start.'}</p>
@@ -447,19 +443,18 @@ const QuizEditPage: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {questions.map((question, index) => (
-                <div key={question.id} data-testid={`question-row-${index}`} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 transition-colors">
+                <div key={question.id} data-testid={`question-row-${index}`} className="border border-border rounded-card p-4 hover:border-brand transition-colors">
                   {editingQuestionId === question.id ? (
                     // Edit Mode
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           {language === 'vi' ? 'Câu hỏi' : 'Question'}
                         </label>
-                        <textarea
+                        <Textarea
                           data-testid={`question-text-input-${index}`}
                           value={currentQuestion}
                           onChange={(e) => setCurrentQuestion(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                           rows={2}
                           placeholder={language === 'vi' ? 'Nhập câu hỏi' : 'Enter question'}
                         />
@@ -467,7 +462,7 @@ const QuizEditPage: React.FC = () => {
 
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block text-sm font-medium text-foreground">
                             {language === 'vi' ? 'Đáp án' : 'Answers'}
                           </label>
                           <label className="flex items-center gap-2 text-sm">
@@ -485,7 +480,7 @@ const QuizEditPage: React.FC = () => {
                                   setCurrentOptions(updatedOptions);
                                 }
                               }}
-                              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                              className="rounded border-border text-brand focus:ring-brand"
                             />
                             {language === 'vi' ? 'Nhiều đáp án đúng' : 'Multiple correct answers'}
                           </label>
@@ -499,20 +494,20 @@ const QuizEditPage: React.FC = () => {
                                 data-testid={`correct-option-radio-${index}-${optIndex}`}
                                 checked={option.isCorrect}
                                 onChange={(e) => handleUpdateOption(optIndex, 'isCorrect', e.target.checked)}
-                                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                className="rounded border-border text-brand focus:ring-brand"
                               />
-                              <input
+                              <Input
                                 type="text"
                                 data-testid={`option-text-input-${index}-${optIndex}`}
                                 value={option.text}
                                 onChange={(e) => handleUpdateOption(optIndex, 'text', e.target.value)}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                 placeholder={`${language === 'vi' ? 'Đáp án' : 'Answer'} ${optIndex + 1}`}
+                                className="flex-1"
                               />
                               <button
                                 data-testid={`delete-option-button-${index}-${optIndex}`}
                                 onClick={() => handleDeleteOption(optIndex)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-danger hover:bg-danger-soft rounded-button transition-colors"
                                 disabled={currentOptions.length <= 2}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -524,7 +519,7 @@ const QuizEditPage: React.FC = () => {
                           <button
                             data-testid={`add-option-button-${index}`}
                             onClick={handleAddOption}
-                            className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                            className="text-sm text-brand hover:text-brand-hover flex items-center gap-1"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -535,34 +530,32 @@ const QuizEditPage: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           {language === 'vi' ? 'Giải thích (tùy chọn)' : 'Explanation (optional)'}
                         </label>
-                        <textarea
+                        <Textarea
                           value={currentExplanation}
                           onChange={(e) => setCurrentExplanation(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                           rows={2}
                           placeholder={language === 'vi' ? 'Nhập giải thích cho đáp án' : 'Enter explanation for the answer'}
                         />
                       </div>
 
                       <div className="flex gap-2">
-                        <button
+                        <Button
                           data-testid={`save-question-button-${index}`}
                           onClick={handleSaveQuestion}
                           disabled={!currentQuestion || currentOptions.length < 2 || !currentOptions.some(opt => opt.isCorrect)}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           {language === 'vi' ? 'Lưu' : 'Save'}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="secondary"
                           data-testid={`cancel-question-edit-button-${index}`}
                           onClick={handleCancelEdit}
-                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                         >
                           {language === 'vi' ? 'Hủy' : 'Cancel'}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -571,23 +564,23 @@ const QuizEditPage: React.FC = () => {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold text-gray-900">#{index + 1}</span>
+                            <span className="font-semibold text-foreground">#{index + 1}</span>
                             {question.allowMultipleAnswers && (
-                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              <Badge tone="info">
                                 {language === 'vi' ? 'Nhiều đáp án' : 'Multiple'}
-                              </span>
+                              </Badge>
                             )}
                           </div>
-                          <p className="text-gray-900 font-medium mb-3">{question.question || <span className="text-gray-400 italic">{language === 'vi' ? 'Câu hỏi trống' : 'Empty question'}</span>}</p>
+                          <p className="text-foreground font-medium mb-3">{question.question || <span className="text-faint-foreground italic">{language === 'vi' ? 'Câu hỏi trống' : 'Empty question'}</span>}</p>
                           <div className="space-y-1">
                             {question.options.map((option) => (
-                              <div key={option.id} className={`text-sm ${option.isCorrect ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
-                                {option.isCorrect ? '✓ ' : '○ '}{option.text || <span className="text-gray-400 italic">{language === 'vi' ? 'Đáp án trống' : 'Empty answer'}</span>}
+                              <div key={option.id} className={`text-sm ${option.isCorrect ? 'text-success-strong font-medium' : 'text-muted-foreground'}`}>
+                                {option.isCorrect ? '✓ ' : '○ '}{option.text || <span className="text-faint-foreground italic">{language === 'vi' ? 'Đáp án trống' : 'Empty answer'}</span>}
                               </div>
                             ))}
                           </div>
                           {question.explanation && (
-                            <p className="text-sm text-gray-500 mt-2 italic">
+                            <p className="text-sm text-muted-foreground mt-2 italic">
                               {language === 'vi' ? 'Giải thích: ' : 'Explanation: '}{question.explanation}
                             </p>
                           )}
@@ -597,7 +590,7 @@ const QuizEditPage: React.FC = () => {
                             data-testid={`move-question-up-button-${index}`}
                             onClick={() => handleMoveQuestion(index, 'up')}
                             disabled={index === 0}
-                            className="p-1 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-1 text-muted-foreground hover:bg-muted rounded disabled:opacity-50 disabled:cursor-not-allowed"
                             title={language === 'vi' ? 'Di chuyển lên' : 'Move up'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -608,7 +601,7 @@ const QuizEditPage: React.FC = () => {
                             data-testid={`move-question-down-button-${index}`}
                             onClick={() => handleMoveQuestion(index, 'down')}
                             disabled={index === questions.length - 1}
-                            className="p-1 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-1 text-muted-foreground hover:bg-muted rounded disabled:opacity-50 disabled:cursor-not-allowed"
                             title={language === 'vi' ? 'Di chuyển xuống' : 'Move down'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -618,7 +611,7 @@ const QuizEditPage: React.FC = () => {
                           <button
                             data-testid={`edit-question-button-${index}`}
                             onClick={() => handleEditQuestion(question)}
-                            className="p-1 text-indigo-600 hover:bg-indigo-50 rounded"
+                            className="p-1 text-brand hover:bg-brand-subtle rounded"
                             title={language === 'vi' ? 'Chỉnh sửa' : 'Edit'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -628,7 +621,7 @@ const QuizEditPage: React.FC = () => {
                           <button
                             data-testid={`remove-question-button-${index}`}
                             onClick={() => handleDeleteQuestion(question.id)}
-                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            className="p-1 text-danger hover:bg-danger-soft rounded"
                             title={language === 'vi' ? 'Xóa' : 'Delete'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

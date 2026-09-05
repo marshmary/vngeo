@@ -8,6 +8,7 @@ import type {
   DeviceBreakdown,
 } from '@/types/analytics.types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { Button } from '@/components/ui';
 import StatsCard from './StatsCard';
 import HourlyVisitsChart from './HourlyVisitsChart';
 import TopPagesTable from './TopPagesTable';
@@ -63,7 +64,7 @@ const AnalyticsDashboard: React.FC = () => {
   if (!stats) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">{t('admin.analytics.noData')}</p>
+        <p className="text-muted-foreground">{t('admin.analytics.noData')}</p>
       </div>
     );
   }
@@ -73,17 +74,14 @@ const AnalyticsDashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-foreground">
             {t('admin.analytics.title')}
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             {t('admin.analytics.subtitle')}
           </p>
         </div>
-        <button
-          onClick={loadAnalyticsData}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-        >
+        <Button onClick={loadAnalyticsData}>
           <svg
             className="w-5 h-5"
             fill="none"
@@ -98,7 +96,7 @@ const AnalyticsDashboard: React.FC = () => {
             />
           </svg>
           {t('admin.analytics.refresh')}
-        </button>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -137,16 +135,16 @@ const AnalyticsDashboard: React.FC = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Hourly Visits Chart */}
-        <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-card rounded-card shadow-card p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             {t('admin.analytics.hourlyVisits')}
           </h3>
           <HourlyVisitsChart data={hourlyData} />
         </div>
 
         {/* Device Breakdown */}
-        <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-card rounded-card shadow-card p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             {t('admin.analytics.deviceBreakdown')}
           </h3>
           <DeviceBreakdownChart data={deviceBreakdown} />
@@ -154,8 +152,8 @@ const AnalyticsDashboard: React.FC = () => {
       </div>
 
       {/* Top Pages Table */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-card rounded-card shadow-card p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           {t('admin.analytics.mostVisitedPages')}
         </h3>
         <TopPagesTable pages={topPages} />

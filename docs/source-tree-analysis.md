@@ -1,6 +1,6 @@
 # Source Tree Analysis — Vietnam Economic Zones (vngeo)
 
-> Verified 2026-08-01. The repo was reorganized on 2026-08-01: **the app lives at the repo root** (there is no `vietnam-economic-zones/` directory), and the entire local-Supabase/Docker stack lives under `supabase/`. Ignore `node_modules`, `dist`, `.git`, and `supabase/supabase-volumes/`.
+> Verified 2026-08-01; re-verified 2026-09-05 for the UI restructure (`de2809f` — DESIGN.md system, `src/components/ui/`). The repo was reorganized on 2026-08-01: **the app lives at the repo root** (there is no `vietnam-economic-zones/` directory), and the entire local-Supabase/Docker stack lives under `supabase/`. Ignore `node_modules`, `dist`, `.git`, and `supabase/supabase-volumes/`.
 
 ## Annotated tree
 
@@ -13,13 +13,16 @@ vngeo/                          # repo root = app root
 ├── tsconfig.node.json          # build-tool config (vite.config.ts)
 ├── vite.config.ts              # plugin-react, '@' alias, terser (drops console.log/info/debug)
 ├── eslint.config.js            # flat config, typescript-eslint, react-hooks, react-refresh
-├── tailwind.config.js          # v3 module.exports; brand + zone tokens; Inter / Plus Jakarta Sans
+├── tailwind.config.js          # v3 module.exports; semantic design tokens per DESIGN.md; Inter / Plus Jakarta Sans
 ├── postcss.config.js           # tailwindcss + autoprefixer
 ├── netlify.toml                # publish=dist, functions=netlify/functions (⚠️ dir absent), SPA redirects
 ├── playwright.config.ts        # 5 projects, local/staging/production envs, auto-starts dev server
 ├── .nvmrc                      # 20
 ├── .env.local(.example)        # VITE_* (Vite frontend)
-├── README.md, REORGANIZATION.md
+├── README.md                   # project overview + quick start
+├── DESIGN.md                   # design-system source of truth (tokens, components, rules) — added 2026-08-02
+├── MIGRATION-CONTRACT.md       # styling-migration rules, token swap map, holdouts — added 2026-08-02
+├── HANDOFF.md                  # self-contained continuation doc (goals for the ui-restructure branch)
 │
 ├── public/
 │   └── vietnam-map-data/       # static GeoJSON (GADM): gadm41_VNM_0.json (border), gadm41_VNM_1.json (provinces)
@@ -27,10 +30,11 @@ vngeo/                          # repo root = app root
 ├── src/                        # app source — "@/" alias → ./src
 │   ├── main.tsx                # React bootstrap (StrictMode → <App/>)
 │   ├── App.tsx                 # BrowserRouter, initializeAuth() on mount, route table, <Sidebar/> + <Notification/>
-│   ├── App.css, index.css      # global styles; Leaflet CSS + @font CSS vars
-│   ├── assets/                 # react.svg
+│   ├── index.css               # global styles; Leaflet CSS; Tailwind layers (App.css removed 2026-08-02)
 │   │
 │   ├── components/             # React components (default exports)
+│   │   ├── ui/                 # design-system primitives (added 2026-08-02): Button, Card, Input/Textarea/Select,
+│   │   │                       # Badge, Spinner, Pagination (+ index.ts barrel) — import from '@/components/ui'
 │   │   ├── admin/              # AnalyticsDashboard, StatsCard, HourlyVisitsChart, DeviceBreakdownChart,
 │   │   │                       # TopPagesTable, FileManager, FileCard, FileUpload, QuizManager, GeneralSettings
 │   │   ├── auth/               # AdminRoute, ProtectedRoute (unused), UserProfileDropdown
@@ -64,7 +68,6 @@ vngeo/                          # repo root = app root
 ├── playwright/                 # E2E (run from repo root via npm run test:e2e)
 │   ├── e2e/                    # authentication.spec.ts, homepage.spec.ts, quiz.spec.ts
 │   ├── support/                # fixtures.ts, factories/ (user/quiz/document, faker), helpers/auth-helpers.ts
-│   ├── auth-sessions/          # storage state
 │   └── .env.example            # TEST_ENV, test creds, staging/production URLs
 │
 ├── supabase/                   # ⬅ entire local-Supabase/Docker stack (run docker from HERE)
@@ -89,7 +92,7 @@ vngeo/                          # repo root = app root
 | Folder | Role |
 |---|---|
 | `src/` | Entire application (app-at-root after reorg). `@/` alias target. |
-| `src/components/{admin,auth,common,debug,guide,map,zone}` | UI layer — see [component-inventory.md](./component-inventory.md). |
+| `src/components/{ui,admin,auth,common,debug,guide,map,zone}` | UI layer — `ui/` holds the design-system primitives; see [component-inventory.md](./component-inventory.md). |
 | `src/services/` | **The only place Supabase is called from** — static service classes. |
 | `src/stores/` | Zustand v5 global state (`authStore`, `mapStore`, `uiStore`). |
 | `schemas/` | Human-reference SQL (numbered, applied via SQL Editor). |

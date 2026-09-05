@@ -8,7 +8,7 @@ interface HourlyVisitsChartProps {
 const HourlyVisitsChart: React.FC<HourlyVisitsChartProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No hourly data available
       </div>
     );
@@ -51,15 +51,15 @@ const HourlyVisitsChart: React.FC<HourlyVisitsChartProps> = ({ data }) => {
               <div
                 className={`w-full rounded-t-lg transition-all ${
                   isRecent
-                    ? 'bg-indigo-600 hover:bg-indigo-700'
-                    : 'bg-indigo-400 hover:bg-indigo-500'
+                    ? 'bg-brand hover:bg-brand-hover'
+                    : 'bg-brand-ring hover:bg-brand'
                 }`}
                 style={{ height: `${Math.max(height, 2)}%` }}
                 title={`${item.visit_count} visits at ${formatHour(item.hour_timestamp)}`}
               />
 
               {/* Tooltip */}
-              <div className="hidden group-hover:block absolute -mt-12 bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+              <div className="hidden group-hover:block absolute -mt-12 bg-foreground text-background text-xs rounded px-2 py-1 whitespace-nowrap z-10">
                 {item.visit_count} visits
               </div>
             </div>
@@ -68,19 +68,19 @@ const HourlyVisitsChart: React.FC<HourlyVisitsChartProps> = ({ data }) => {
       </div>
 
       {/* X-axis labels */}
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between text-xs text-muted-foreground">
         <span>{formatHour(chartData[0]?.hour_timestamp || new Date().toISOString())}</span>
         <span>Now</span>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 pt-4 text-sm text-gray-600">
+      <div className="flex items-center justify-center gap-4 pt-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded bg-indigo-400" />
+          <div className="w-3 h-3 rounded bg-brand-ring" />
           <span>Older hours</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded bg-indigo-600" />
+          <div className="w-3 h-3 rounded bg-brand" />
           <span>Recent hours</span>
         </div>
       </div>

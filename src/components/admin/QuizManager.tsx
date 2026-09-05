@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import ConfirmationModal from '@/components/common/ConfirmationModal';
 import { QuizService } from '@/services/quizService';
 import type { Quiz } from '@/types/quiz.types';
+import { Button, Input, Textarea, Select, Badge, Spinner } from '@/components/ui';
+import type { BadgeTone } from '@/components/ui';
 
 const QuizManager: React.FC = () => {
   const { t } = useTranslation();
@@ -105,21 +107,23 @@ const QuizManager: React.FC = () => {
     setQuizToDelete(null);
   };
 
-  const getStatusColor = (status: string) => {
+  // Status/difficulty → semantic badge tones (replaces the old 100+800 color
+  // maps; see MIGRATION-CONTRACT.md status-color swap map).
+  const getStatusTone = (status: string): BadgeTone => {
     switch (status) {
-      case 'published': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      case 'archived': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'published': return 'success';
+      case 'draft': return 'warning';
+      case 'archived': return 'neutral';
+      default: return 'neutral';
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyTone = (difficulty: string): BadgeTone => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'hard': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'easy': return 'success';
+      case 'medium': return 'warning';
+      case 'hard': return 'danger';
+      default: return 'neutral';
     }
   };
 
@@ -128,114 +132,112 @@ const QuizManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{t('admin.quiz.title')}</h2>
-          <p className="text-gray-600">{t('admin.quiz.description')}</p>
+          <h2 className="text-2xl font-bold text-foreground">{t('admin.quiz.title')}</h2>
+          <p className="text-muted-foreground">{t('admin.quiz.description')}</p>
         </div>
-        <button
+        <Button
+          variant="primary"
           data-testid="create-quiz-button"
           onClick={() => setShowCreateForm(true)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
           {t('admin.quiz.createQuiz')}
-        </button>
+        </Button>
       </div>
 
       {/* Create Quiz Form */}
       {showCreateForm && (
-        <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="bg-card rounded-card shadow-card border border-border p-6">
           <h3 className="text-lg font-semibold mb-4">{t('admin.quiz.createNewQuiz')}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.quizTitle')}</label>
-              <input
+              <label className="block text-sm font-medium text-foreground mb-2">{t('admin.quiz.quizTitle')}</label>
+              <Input
                 type="text"
                 data-testid="new-quiz-title-input"
                 value={newQuiz.title}
                 onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder={t('admin.quiz.enterQuizTitle')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.description')}</label>
-              <textarea
+              <label className="block text-sm font-medium text-foreground mb-2">{t('admin.quiz.description')}</label>
+              <Textarea
                 data-testid="new-quiz-description-input"
                 value={newQuiz.description}
                 onChange={(e) => setNewQuiz({ ...newQuiz, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 rows={3}
                 placeholder={t('admin.quiz.enterQuizDescription')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.quiz.difficulty')}</label>
-              <select
+              <label className="block text-sm font-medium text-foreground mb-2">{t('admin.quiz.difficulty')}</label>
+              <Select
                 data-testid="new-quiz-difficulty-select"
                 value={newQuiz.difficulty}
                 onChange={(e) => setNewQuiz({ ...newQuiz, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="easy">{t('admin.quiz.easy')}</option>
                 <option value="medium">{t('admin.quiz.medium')}</option>
                 <option value="hard">{t('admin.quiz.hard')}</option>
-              </select>
+              </Select>
             </div>
             <div className="flex gap-3">
-              <button
+              <Button
+                variant="primary"
                 data-testid="submit-create-quiz-button"
                 onClick={handleCreateQuiz}
                 disabled={!newQuiz.title || !newQuiz.description}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {t('admin.quiz.createQuiz')}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
                 data-testid="cancel-create-quiz-button"
                 onClick={() => setShowCreateForm(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
               >
                 {t('admin.quiz.cancel')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
 
       {/* Quizzes List */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-card rounded-card shadow-card border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
           <h3 className="text-lg font-semibold">{t('admin.quiz.allQuizzes')} ({quizzes.length})</h3>
         </div>
         {isLoading ? (
           <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">{t('admin.quiz.loadingQuizzes')}</p>
+            <Spinner className="h-12 w-12 mx-auto mb-4" />
+            <p className="text-muted-foreground">{t('admin.quiz.loadingQuizzes')}</p>
           </div>
         ) : quizzes.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
+          <div className="p-12 text-center text-muted-foreground">
             {t('admin.quiz.noQuizzes')}
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-border">
             {quizzes.map((quiz) => (
-            <div key={quiz.id} data-testid={`quiz-row-${quiz.id}`} className="p-6 hover:bg-gray-50 transition-colors">
+            <div key={quiz.id} data-testid={`quiz-row-${quiz.id}`} className="p-6 hover:bg-muted transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h4 className="text-lg font-semibold text-gray-900">{quiz.title}</h4>
+                    <h4 className="text-lg font-semibold text-foreground">{quiz.title}</h4>
                     <div className="flex items-center gap-1">
-                      <span
+                      <Badge
+                        tone={getStatusTone(quiz.status)}
                         data-testid={`quiz-status-${quiz.id}`}
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(quiz.status)} cursor-help`}
+                        className="cursor-help"
                         title={t(`admin.quiz.statusDescriptions.${quiz.status}`)}
                       >
                         {t(`admin.quiz.status.${quiz.status}`)}
-                      </span>
+                      </Badge>
                       <svg
-                        className="w-3 h-3 text-gray-400 cursor-help"
+                        className="w-3 h-3 text-faint-foreground cursor-help"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -246,12 +248,12 @@ const QuizManager: React.FC = () => {
                         />
                       </svg>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(quiz.difficulty)}`}>
+                    <Badge tone={getDifficultyTone(quiz.difficulty)}>
                       {t(`admin.quiz.${quiz.difficulty}`)}
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="text-gray-600 mb-2">{quiz.description}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <p className="text-muted-foreground mb-2">{quiz.description}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span>{t('admin.quiz.created')}: {new Date(quiz.createdAt).toLocaleDateString()}</span>
                     <span>{t('admin.quiz.updated')}: {new Date(quiz.updatedAt).toLocaleDateString()}</span>
                   </div>
@@ -259,7 +261,7 @@ const QuizManager: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleTakeQuiz(quiz.id)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-success text-white rounded-button hover:opacity-90 transition-colors text-sm font-medium"
                     title={t('admin.quiz.takeQuiz')}
                   >
                     {t('admin.quiz.takeQuiz')}
@@ -267,7 +269,7 @@ const QuizManager: React.FC = () => {
                   <button
                     data-testid={`quiz-edit-button-${quiz.id}`}
                     onClick={() => handleEditQuiz(quiz.id)}
-                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                    className="p-2 text-brand hover:bg-brand-subtle rounded-button transition-colors"
                     title={t('admin.quiz.editQuiz')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,7 +279,7 @@ const QuizManager: React.FC = () => {
                   <button
                     data-testid={`quiz-delete-button-${quiz.id}`}
                     onClick={() => handleDeleteQuiz(quiz)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-danger hover:bg-danger-soft rounded-button transition-colors"
                     title={t('admin.quiz.deleteQuiz')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

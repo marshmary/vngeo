@@ -8,7 +8,7 @@ interface DeviceBreakdownChartProps {
 const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-muted-foreground">
         No device data available
       </div>
     );
@@ -17,7 +17,7 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
   const deviceConfig = {
     desktop: {
       label: 'Desktop',
-      color: 'bg-blue-500',
+      color: 'bg-info',
       icon: (
         <path
           strokeLinecap="round"
@@ -29,7 +29,7 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
     },
     mobile: {
       label: 'Mobile',
-      color: 'bg-green-500',
+      color: 'bg-success',
       icon: (
         <path
           strokeLinecap="round"
@@ -41,7 +41,7 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
     },
     tablet: {
       label: 'Tablet',
-      color: 'bg-purple-500',
+      color: 'bg-brand',
       icon: (
         <path
           strokeLinecap="round"
@@ -53,7 +53,7 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
     },
     unknown: {
       label: 'Unknown',
-      color: 'bg-gray-400',
+      color: 'bg-faint-foreground',
       icon: (
         <path
           strokeLinecap="round"
@@ -81,7 +81,7 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
               {/* Device Row */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${config.color} bg-opacity-10`}>
+                  <div className={`p-2 rounded-card ${config.color}/10`}>
                     <svg
                       className={`w-5 h-5 ${config.color.replace('bg-', 'text-')}`}
                       fill="none"
@@ -92,23 +92,23 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-foreground">
                       {config.label}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {item.visit_count.toLocaleString()} visits
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-foreground">
                     {item.percentage}%
                   </p>
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-sunken rounded-full h-2">
                 <div
                   className={`${config.color} h-2 rounded-full transition-all duration-500`}
                   style={{ width: `${item.percentage}%` }}
@@ -120,12 +120,12 @@ const DeviceBreakdownChart: React.FC<DeviceBreakdownChartProps> = ({ data }) => 
       </div>
 
       {/* Total */}
-      <div className="pt-4 border-t border-gray-200">
+      <div className="pt-4 border-t border-border">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-foreground">
             Total Devices
           </span>
-          <span className="text-sm font-semibold text-gray-900">
+          <span className="text-sm font-semibold text-foreground">
             {totalVisits.toLocaleString()}
           </span>
         </div>

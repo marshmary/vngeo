@@ -19,24 +19,24 @@ const StatsCard: React.FC<StatsCardProps> = ({
 }) => {
   const colorClasses = {
     blue: {
-      bg: 'bg-blue-50',
-      icon: 'text-blue-600',
-      value: 'text-blue-900',
+      bg: 'bg-info-soft',
+      icon: 'text-info',
+      value: 'text-info-strong',
     },
     green: {
-      bg: 'bg-green-50',
-      icon: 'text-green-600',
-      value: 'text-green-900',
+      bg: 'bg-success-soft',
+      icon: 'text-success',
+      value: 'text-success-strong',
     },
     purple: {
-      bg: 'bg-purple-50',
-      icon: 'text-purple-600',
-      value: 'text-purple-900',
+      bg: 'bg-brand-subtle',
+      icon: 'text-brand',
+      value: 'text-brand-hover',
     },
     orange: {
-      bg: 'bg-orange-50',
-      icon: 'text-orange-600',
-      value: 'text-orange-900',
+      bg: 'bg-warning-soft',
+      icon: 'text-warning',
+      value: 'text-warning-strong',
     },
   };
 
@@ -81,16 +81,16 @@ const StatsCard: React.FC<StatsCardProps> = ({
     : value;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-card shadow-card p-6 hover:shadow-overlay transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <p className={`text-3xl font-bold mt-2 ${classes.value}`}>
             {displayValue}
           </p>
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
         </div>
-        <div className={`${classes.bg} p-3 rounded-xl`}>
+        <div className={`${classes.bg} p-3 rounded-card`}>
           <svg
             className={`w-6 h-6 ${classes.icon}`}
             fill="none"

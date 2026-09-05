@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/uiStore';
 import { SettingsService } from '@/services/settingsService';
+import { Button, Input } from '@/components/ui';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const GeneralSettings: React.FC = () => {
@@ -104,12 +105,12 @@ const GeneralSettings: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-card rounded-card shadow-card p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           {t('admin.settings.title')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           {t('admin.settings.description')}
         </p>
       </div>
@@ -117,23 +118,22 @@ const GeneralSettings: React.FC = () => {
       <div className="space-y-6">
         {/* Map Drawing Video URL */}
         <div>
-          <label htmlFor="videoUrl" className="block text-sm font-semibold text-gray-900 mb-2">
+          <label htmlFor="videoUrl" className="block text-sm font-semibold text-foreground mb-2">
             {t('admin.settings.videoUrl')}
           </label>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-muted-foreground mb-3">
             {t('admin.settings.videoUrlDescription')}
           </p>
-          <input
+          <Input
             type="text"
             id="videoUrl"
             data-testid="video-url-input"
             value={videoUrl}
             onChange={handleVideoUrlChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             placeholder="https://www.youtube.com/embed/VIDEO_ID"
           />
           {videoUrl && !isValidUrl(videoUrl) && (
-            <p data-testid="settings-validation-error" className="mt-2 text-sm text-red-600">
+            <p data-testid="settings-validation-error" className="mt-2 text-sm text-danger">
               {t('admin.settings.invalidUrl')}
             </p>
           )}
@@ -141,23 +141,22 @@ const GeneralSettings: React.FC = () => {
 
         {/* Feedback Form URL */}
         <div>
-          <label htmlFor="feedbackUrl" className="block text-sm font-semibold text-gray-900 mb-2">
+          <label htmlFor="feedbackUrl" className="block text-sm font-semibold text-foreground mb-2">
             {t('admin.settings.feedbackUrl')}
           </label>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-muted-foreground mb-3">
             {t('admin.settings.feedbackUrlDescription')}
           </p>
-          <input
+          <Input
             type="text"
             id="feedbackUrl"
             data-testid="feedback-url-input"
             value={feedbackUrl}
             onChange={handleFeedbackUrlChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             placeholder="https://docs.google.com/forms/d/e/FORM_ID/viewform?embedded=true"
           />
           {feedbackUrl && !isValidUrl(feedbackUrl) && (
-            <p data-testid="settings-validation-error" className="mt-2 text-sm text-red-600">
+            <p data-testid="settings-validation-error" className="mt-2 text-sm text-danger">
               {t('admin.settings.invalidUrl')}
             </p>
           )}
@@ -166,10 +165,10 @@ const GeneralSettings: React.FC = () => {
         {/* Preview */}
         {videoUrl && isValidUrl(videoUrl) && (
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2">
               {t('admin.settings.preview')}
             </label>
-            <div className="bg-gray-100 rounded-lg overflow-hidden">
+            <div className="bg-sunken rounded-card overflow-hidden">
               <div className="relative" style={{ paddingTop: '56.25%' }}>
                 <iframe
                   className="absolute top-0 left-0 w-full h-full"
@@ -185,19 +184,20 @@ const GeneralSettings: React.FC = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-          <button
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <Button
+            variant="secondary"
             onClick={handleReset}
             disabled={!hasChanges || isSaving}
-            className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('admin.settings.cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             data-testid="settings-save-button"
+            variant="primary"
             onClick={handleSave}
             disabled={!hasChanges || isSaving || !isValidUrl(videoUrl) || !isValidUrl(feedbackUrl)}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex items-center gap-2"
           >
             {isSaving ? (
               <>
@@ -210,16 +210,16 @@ const GeneralSettings: React.FC = () => {
             ) : (
               t('admin.settings.saveChanges')
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Help Section */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h3 className="text-sm font-semibold text-blue-900 mb-2">
+      <div className="mt-6 p-4 bg-info-soft rounded-card border border-info/30">
+        <h3 className="text-sm font-semibold text-info-strong mb-2">
           💡 {t('admin.settings.tips')}
         </h3>
-        <ul className="text-sm text-blue-800 space-y-1">
+        <ul className="text-sm text-info-strong space-y-1">
           <li>• {t('admin.settings.tip1')}</li>
           <li>• {t('admin.settings.tip2')}</li>
           <li>• {t('admin.settings.tip3')}</li>
