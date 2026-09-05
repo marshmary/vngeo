@@ -1,6 +1,6 @@
 # Architecture — Vietnam Economic Zones (vngeo)
 
-> Verified 2026-08-01 (post-reorganization). The app lives at the repo root; the local-Supabase/Docker stack lives under `supabase/`.
+> Verified 2026-08-01 (post-reorganization); styling claims re-verified 2026-09-05 against the UI restructure (`de2809f`, 2026-08-02). The app lives at the repo root; the local-Supabase/Docker stack lives under `supabase/`.
 
 ## Executive Summary
 
@@ -19,8 +19,9 @@ The repository was reorganized on 2026-08-01: the application was promoted to th
 | State | Zustand | ^5.0.8 | v5 double-call; `persist` + `partialize` |
 | Backend (BaaS) | Supabase JS | ^2.58.0 | Postgres 15, Auth, Storage, RPCs |
 | Maps | react-leaflet / leaflet | ^5.0.0 / ^1.9.4 | GADM GeoJSON |
-| Styling | Tailwind CSS | ^3.4.17 | v3 `module.exports` config |
-| UI primitives | Headless UI | ^2.2.8 | `UserProfileDropdown` |
+| Styling | Tailwind CSS | ^3.4.17 | v3 `module.exports` config; semantic design tokens per `DESIGN.md` (brand/accent/neutrals/status, radius/shadow/type aliases) |
+| In-house UI kit | `src/components/ui` | added 2026-08-02 | `Button`, `Card`, `Input`/`Textarea`/`Select`, `Badge`, `Spinner`, `Pagination`; token-driven, props fully forwarded (e2e-safe) |
+| UI primitives | Headless UI | ^2.2.8 | `UserProfileDropdown` only |
 | Animation | Framer Motion | ^12.23.16 | |
 | Forms | React Hook Form | ^7.63.0 | `LoginPage` |
 | i18n | i18next / react-i18next | ^25.5.2 / ^15.7.3 | fallback `'vi'` |
@@ -101,7 +102,7 @@ No stores use `finally` inside actions; auth actions rethrow, map swallows. Auth
 
 ## Component Overview
 
-~24 components across `admin/`, `auth/`, `common/`, `debug/`, `guide/`, `map/`, `zone/` plus 9 pages. Global chrome is `<Sidebar>` (+ `<Notification>`); the active map is `InteractiveMapContainer`. Notable dead/legacy code: unused `ProtectedRoute`, unused `NavBar`, legacy `MapContainer`/`ZoneLayer`/`ProvinceDebugger`. **Brand/zone Tailwind tokens are defined but unused** — colors reach the UI via inline styles from `constants.ts`.
+32 components across `ui/`, `admin/`, `auth/`, `common/`, `debug/`, `guide/`, `map/`, `zone/` plus 9 pages. Global chrome is `<Sidebar>` (+ `<Notification>`); the active map is `InteractiveMapContainer`. Notable dead/legacy code: unused `ProtectedRoute`, unused `NavBar`, legacy `MapContainer`/`ZoneLayer`/`ProvinceDebugger`. **Styling flows through semantic design tokens and the `ui/` primitives** — `DESIGN.md` (repo root) is the source of truth, `MIGRATION-CONTRACT.md` holds the migration rules and raw-class holdouts; zone/map colors remain inline-style data from `constants.ts` (map components are contract-excluded).
 
 → Full inventory + route table: [component-inventory.md](./component-inventory.md).
 
@@ -135,8 +136,9 @@ The app is at the **repo root** (`src/`, `public/`, `schemas/`, `playwright/`); 
 - **i18n fallback is `'vi'`** (Vietnamese), not `'en'`.
 - **`react-router` v8**, not `react-router-dom`.
 - **Tailwind v3** config format; `erasableSyntaxOnly` forbids `enum`/`namespace`; `verbatimModuleSyntax` requires `import type`.
-- **`clsx` is installed but unused** — use template literals for conditional classes.
-- **Colors via data, not tokens** — brand/zone Tailwind tokens are latent; components use inline styles from `constants.ts` + the default palette.
+- **`clsx`** is the conditional-class helper in the `src/components/ui/` primitives (adopted 2026-08-02; prefer it over template literals in new primitives).
+- **Styling via semantic tokens, not raw palette utilities** — pages consume `bg-brand` / `text-foreground` / `rounded-card`-style tokens or `ui/` primitives; the only raw colors left are the e2e-asserted contract holdouts (`MIGRATION-CONTRACT.md`) and the data-driven zone palette in `constants.ts`.
+- **`DESIGN.md` is the styling source of truth** — change the visual identity there first, then mirror in `tailwind.config.js`.
 
 ---
 
